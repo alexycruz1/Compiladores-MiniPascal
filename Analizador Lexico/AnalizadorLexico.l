@@ -98,14 +98,12 @@ Punto="."
 Variable={Caracter}+({Digito}|{Caracter})*
 
 //STRING
-//Constchar=^'((.)?)'$
-//Conststr=^'((.)(.)(.)*)'$
 Constchar=([\']([^'])[\'])|''
 Conststr=[\']([^']+)*[\']
-
+String=[\"]([^"]+)*[\"]
 
 //COMMENTS
-Comments="{"(.)*"}"
+Comments="\{"(.|\n)*"\}"
 
 //ESPACIOS Y SALTOS DE LINEA
 WhiteSpace=[\ \n\r\t\f]
@@ -115,8 +113,9 @@ WhiteSpace=[\ \n\r\t\f]
 <YYINITIAL> {
     {Constchar} {System.out.println("Encontre un constchar: " + yytext() + "\n" + "Linea: " + (yyline + 1) + " Columna: " + (yycolumn + 1) + "\n");}
     {Conststr} {System.out.println("Encontre un conststr: " + yytext() + "\n" + "Linea: " + (yyline + 1) + " Columna: " + (yycolumn + 1) + "\n");}
+    {String} {System.out.println("Encontre cadena: " + yytext() + "\n" + "Linea: " + (yyline + 1) + " Columna: " + (yycolumn + 1) + "\n");}
 
-    {Comments} {System.out.println("Encontre una comentario: " + yytext() + "\n" + "Linea: " + (yyline + 1) + " Columna: " + (yycolumn + 1) + "\n");}
+    {Comments} {System.out.println("Encontre un comentario: " + yytext() + "\n" + "Linea: " + (yyline + 1) + " Columna: " + (yycolumn + 1) + "\n");}
     
     {Absolute} {System.out.println("Encontre una palabra reservada: " + yytext() + "\n" + "Linea: " + (yyline + 1) + " Columna: " + (yycolumn + 1) + "\n");}
     {Begin} {System.out.println("Encontre una palabra reservada: " + yytext() + "\n" + "Linea: " + (yyline + 1) + " Columna: " + (yycolumn + 1) + "\n");}
