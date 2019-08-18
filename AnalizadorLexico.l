@@ -14,8 +14,6 @@
 //DEFINICIONES UTILES
 Digito=[0-9]
 Numero={Digito}({Digito})*
-Float={Numero}.{Numero}
-NegativeFloat="-"+{Float}
 NegativeInteger="-"+{Numero}
 Caracter=[a-z]|[A-Z]
 
