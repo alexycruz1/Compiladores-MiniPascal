@@ -30,10 +30,12 @@ usuario. El proyecto a presentar debe considerar:
 * Deberán implementarse las funciones write y read para lectura y escritura de variables. Se deberá adaptar la gramática para incluir estas funciones.
 
 ```
-La función read recibe como parámetro una variable donde se almacenará el valor leido. Este valor podrá ser de tipo integer o char, no podrán leerse datos de tipo boolean.
+La función read recibe como parámetro una variable donde se almacenará el valor leido. 
+Este valor podrá ser de tipo integer o char, no podrán leerse datos de tipo boolean.
 ```
 ```
-La función write recibe uno o dos parámetros. El primer parámetro es un conststr. El segundo parámetro (si existe) será una variable de tipo integer, char o string.
+La función write recibe uno o dos parámetros. El primer parámetro es un conststr. 
+El segundo parámetro (si existe) será una variable de tipo integer, char o string.
 ```
 
 * Se deberán reconocer operaciones aritméticas conforme a la precedencia de operadores comúnmente conocida.
