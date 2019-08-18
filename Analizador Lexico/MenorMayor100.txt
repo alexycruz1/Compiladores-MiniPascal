@@ -1,0 +1,15 @@
+PROGRAM EJER35;         
+USES CRT;         
+VAR num:INTEGER;
+BEGIN  ClrScr;         
+WRITE ('Escriba un numero entero:');    
+READLN (num);         
+WRITELN ('');         
+IF num < 100 THEN         
+	WRITE ('El numero que ha escrito es menor de 100')         
+	ELSE IF num > 100  THEN         
+	WRITE ('El numero que ha escrito es mayor de 100')         
+	ELSE         
+	WRITE ('El numero es 100') 
+	
+END. 
