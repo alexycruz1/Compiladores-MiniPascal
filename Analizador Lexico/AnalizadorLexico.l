@@ -105,6 +105,11 @@ WhiteSpace=[\ \n\r\t\f]
 %%
 
 <YYINITIAL> {
-    {StringPattern} {System.out.println("Encontre una string: " + yytext());}
+    {StringPattern} {System.out.println("Encontre una string: " + yytext() + "\n" + "Linea: " + (yyline + 1) + " Columna: " + (yycolumn + 1) + "\n");}
+    {Comments} {System.out.println("Encontre una comentario: " + yytext() + "\n" + "Linea: " + (yyline + 1) + " Columna: " + (yycolumn + 1) + "\n");}
 
+    {Variable} {System.out.println("Encontre una variable: " + yytext() + "\n" + "Linea: " + (yyline + 1) + " Columna: " + (yycolumn + 1) + "\n");}
+
+    {WhiteSpace} {}
+    .   {}
 }
