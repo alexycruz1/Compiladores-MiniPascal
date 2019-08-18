@@ -67,6 +67,8 @@ While="while"
 Xor="xor"
 Write="write"
 Read="read"
+Writeln="writeln"
+Readln="readln"
 
 //TIPOS
 Tipo="integer" | "char" | "boolean" | "record"
@@ -85,19 +87,25 @@ OpMult="*"|"/"|"div"|"mod"
 
 //SIMBOLOS  
 AsignacionVariable=":="
+AsignacionTipo=":"
 FinalInstruccion=";"
 ParentesisAbierto="("
 ParentesisCerrado=")"
 Coma=","
+Punto="."
 
 //ID
 Variable={Caracter}+({Digito}|{Caracter})*
 
 //STRING
-StringPattern=[\"](.)*[\"]
+//Constchar=^'((.)?)'$
+//Conststr=^'((.)(.)(.)*)'$
+Constchar=([\']([^'])[\'])|''
+Conststr=[\']([^']+)*[\']
+
 
 //COMMENTS
-Comments="{"[^\n]*"}"
+Comments="{"(.)*"}"
 
 //ESPACIOS Y SALTOS DE LINEA
 WhiteSpace=[\ \n\r\t\f]
@@ -105,7 +113,9 @@ WhiteSpace=[\ \n\r\t\f]
 %%
 
 <YYINITIAL> {
-    {StringPattern} {System.out.println("Encontre una string: " + yytext() + "\n" + "Linea: " + (yyline + 1) + " Columna: " + (yycolumn + 1) + "\n");}
+    {Constchar} {System.out.println("Encontre un constchar: " + yytext() + "\n" + "Linea: " + (yyline + 1) + " Columna: " + (yycolumn + 1) + "\n");}
+    {Conststr} {System.out.println("Encontre un conststr: " + yytext() + "\n" + "Linea: " + (yyline + 1) + " Columna: " + (yycolumn + 1) + "\n");}
+
     {Comments} {System.out.println("Encontre una comentario: " + yytext() + "\n" + "Linea: " + (yyline + 1) + " Columna: " + (yycolumn + 1) + "\n");}
     
     {Absolute} {System.out.println("Encontre una palabra reservada: " + yytext() + "\n" + "Linea: " + (yyline + 1) + " Columna: " + (yycolumn + 1) + "\n");}
@@ -157,28 +167,33 @@ WhiteSpace=[\ \n\r\t\f]
     {Xor} {System.out.println("Encontre una palabra reservada: " + yytext() + "\n" + "Linea: " + (yyline + 1) + " Columna: " + (yycolumn + 1) + "\n");}
     {Write} {System.out.println("Encontre una palabra reservada: " + yytext() + "\n" + "Linea: " + (yyline + 1) + " Columna: " + (yycolumn + 1) + "\n");}
     {Read} {System.out.println("Encontre una palabra reservada: " + yytext() + "\n" + "Linea: " + (yyline + 1) + " Columna: " + (yycolumn + 1) + "\n");}
+    {Writeln} {System.out.println("Encontre una palabra reservada: " + yytext() + "\n" + "Linea: " + (yyline + 1) + " Columna: " + (yycolumn + 1) + "\n");}
+    {Readln} {System.out.println("Encontre una palabra reservada: " + yytext() + "\n" + "Linea: " + (yyline + 1) + " Columna: " + (yycolumn + 1) + "\n");}
 
-    {Tipo} {System.out.println("Encontre una palabra reservada: " + yytext() + "\n" + "Linea: " + (yyline + 1) + " Columna: " + (yycolumn + 1) + "\n");}
+    {Tipo} {System.out.println("Encontre un tipo: " + yytext() + "\n" + "Linea: " + (yyline + 1) + " Columna: " + (yycolumn + 1) + "\n");}
     
-    {Not} {System.out.println("Encontre una palabra reservada: " + yytext() + "\n" + "Linea: " + (yyline + 1) + " Columna: " + (yycolumn + 1) + "\n");}
-    {Or} {System.out.println("Encontre una palabra reservada: " + yytext() + "\n" + "Linea: " + (yyline + 1) + " Columna: " + (yycolumn + 1) + "\n");}
-    {And} {System.out.println("Encontre una palabra reservada: " + yytext() + "\n" + "Linea: " + (yyline + 1) + " Columna: " + (yycolumn + 1) + "\n");}
+    {Not} {System.out.println("Encontre un operador logico: " + yytext() + "\n" + "Linea: " + (yyline + 1) + " Columna: " + (yycolumn + 1) + "\n");}
+    {Or} {System.out.println("Encontre un operador logico: " + yytext() + "\n" + "Linea: " + (yyline + 1) + " Columna: " + (yycolumn + 1) + "\n");}
+    {And} {System.out.println("Encontre un operador logico: " + yytext() + "\n" + "Linea: " + (yyline + 1) + " Columna: " + (yycolumn + 1) + "\n");}
     
-    {OpSuma} {System.out.println("Encontre una palabra reservada: " + yytext() + "\n" + "Linea: " + (yyline + 1) + " Columna: " + (yycolumn + 1) + "\n");}
-    {OpMult} {System.out.println("Encontre una palabra reservada: " + yytext() + "\n" + "Linea: " + (yyline + 1) + " Columna: " + (yycolumn + 1) + "\n");}
+    {OpSuma} {System.out.println("Encontre un operador aritmetico: " + yytext() + "\n" + "Linea: " + (yyline + 1) + " Columna: " + (yycolumn + 1) + "\n");}
+    {OpMult} {System.out.println("Encontre un operador aritmetico: " + yytext() + "\n" + "Linea: " + (yyline + 1) + " Columna: " + (yycolumn + 1) + "\n");}
+
+    {OpRel} {System.out.println("Encontre un operador relacional: " + yytext() + "\n" + "Linea: " + (yyline + 1) + " Columna: " + (yycolumn + 1) + "\n");}
     
-    {AsignacionVariable} {System.out.println("Encontre una palabra reservada: " + yytext() + "\n" + "Linea: " + (yyline + 1) + " Columna: " + (yycolumn + 1) + "\n");}
-    {FinalInstruccion} {System.out.println("Encontre una palabra reservada: " + yytext() + "\n" + "Linea: " + (yyline + 1) + " Columna: " + (yycolumn + 1) + "\n");}
-    {ParentesisAbierto} {System.out.println("Encontre una palabra reservada: " + yytext() + "\n" + "Linea: " + (yyline + 1) + " Columna: " + (yycolumn + 1) + "\n");}
-    {ParentesisCerrado} {System.out.println("Encontre una palabra reservada: " + yytext() + "\n" + "Linea: " + (yyline + 1) + " Columna: " + (yycolumn + 1) + "\n");}
-    {Coma} {System.out.println("Encontre una palabra reservada: " + yytext() + "\n" + "Linea: " + (yyline + 1) + " Columna: " + (yycolumn + 1) + "\n");}
+    {AsignacionVariable} {System.out.println("Encontre una asignacion de variable: " + yytext() + "\n" + "Linea: " + (yyline + 1) + " Columna: " + (yycolumn + 1) + "\n");}
+    {AsignacionTipo} {System.out.println("Encontre una asignacion de tipo: " + yytext() + "\n" + "Linea: " + (yyline + 1) + " Columna: " + (yycolumn + 1) + "\n");}
     
-    {Variable} {System.out.println("Encontre una palabra reservada: " + yytext() + "\n" + "Linea: " + (yyline + 1) + " Columna: " + (yycolumn + 1) + "\n");}
-    {StringPattern} {System.out.println("Encontre una palabra reservada: " + yytext() + "\n" + "Linea: " + (yyline + 1) + " Columna: " + (yycolumn + 1) + "\n");}
-    {Comments} {System.out.println("Encontre una palabra reservada: " + yytext() + "\n" + "Linea: " + (yyline + 1) + " Columna: " + (yycolumn + 1) + "\n");}
-    {WhiteSpace} {System.out.println("Encontre una palabra reservada: " + yytext() + "\n" + "Linea: " + (yyline + 1) + " Columna: " + (yycolumn + 1) + "\n");}
+    {FinalInstruccion} {System.out.println("Encontre el final de una instruccion: " + yytext() + "\n" + "Linea: " + (yyline + 1) + " Columna: " + (yycolumn + 1) + "\n");}
+    
+    {ParentesisAbierto} {System.out.println("Encontre un parentesis abierto: " + yytext() + "\n" + "Linea: " + (yyline + 1) + " Columna: " + (yycolumn + 1) + "\n");}
+    {ParentesisCerrado} {System.out.println("Encontre un parentesis cerrado: " + yytext() + "\n" + "Linea: " + (yyline + 1) + " Columna: " + (yycolumn + 1) + "\n");}
+    
+    {Coma} {System.out.println("Encontre una coma: " + yytext() + "\n" + "Linea: " + (yyline + 1) + " Columna: " + (yycolumn + 1) + "\n");}
+    {Punto} {System.out.println("Encontre un punto: " + yytext() + "\n" + "Linea: " + (yyline + 1) + " Columna: " + (yycolumn + 1) + "\n");}
 
     {Variable} {System.out.println("Encontre una variable: " + yytext() + "\n" + "Linea: " + (yyline + 1) + " Columna: " + (yycolumn + 1) + "\n");}
+
     {WhiteSpace} {}
-    .   {}
+    .   {System.out.println("ERROR: " + yytext() + "\n" + "Linea: " + (yyline + 1) + " Columna: " + (yycolumn + 1) + "\n");}
 }

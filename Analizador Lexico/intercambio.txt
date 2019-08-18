@@ -8,12 +8,12 @@ BEGIN
  WRITELN ('');
     IF num1 > num2 THEN
     BEGIN
-         WRITE(num2,' ',num1,'. El primer numero introducido es mayor.');
+         WRITE(num2,' ',num1, '. El primer numero introducido es mayor.');
     WRITE(' Se cambia el orden.');
     END
     ELSE
      BEGIN
-     WRITE(num1,' ',num2,'. El segundo numero introducido es mayor.');
-     WRITE(' No se cambia el orden.');
+     WRITE(num1,' ',num2, '. El segundo numero introducido es mayor.');
+     WRITE('');
      END; 
-END. 
+END.
