@@ -95,15 +95,17 @@ Coma=","
 Punto="."
 
 //ID
-Variable={Caracter}+({Digito}|{Caracter})*
+Variable={Caracter}({Digito}|{Caracter})*
 
 //STRING
 Constchar=([\']([^'])[\'])|''
 Conststr=[\']([^']+)*[\']
-String=[\"]([^"]+)*[\"]
+String=[\"]([^\"]+)*[\"]
 
 //COMMENTS
-Comments="\{"(.|\n)*"\}"
+LlaveAbierta="\{"
+LlaveCerrada="\}"
+Comments=\{([^}]*|[^{]*)\}
 
 //ESPACIOS Y SALTOS DE LINEA
 WhiteSpace=[\ \n\r\t\f]

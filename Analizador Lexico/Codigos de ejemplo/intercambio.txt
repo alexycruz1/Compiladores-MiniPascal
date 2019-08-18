@@ -4,11 +4,13 @@ PROGRAM EJER37;
 BEGIN
  ClrScr;
  WRITELN ('Escriba dos numeros: ');
+ 
  READLN (num1); WRITE (''); READLN (num2);
  WRITELN ('');
     IF num1 > num2 THEN
     BEGIN
-         WRITE(num2,' ',num1, '. El primer numero introducido es mayor.');
+  
+               WRITE(num2,' ',num1, '. El primer numero introducido es mayor.');
     WRITE(' Se cambia el orden.');
     END
     ELSE
@@ -17,3 +19,11 @@ BEGIN
      WRITE('');
      END; 
 END.
+
+{
+     {
+          {
+               
+          }
+     }
+}
