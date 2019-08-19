@@ -1,4 +1,4 @@
-//import java_cup.runtime.*;
+import java_cup.runtime.*;
 
 %%
 
@@ -7,7 +7,7 @@
 %line
 %column
 %ignorecase
-//%cup
+%cup
 %int
 %standalone
 
