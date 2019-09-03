@@ -1,0 +1,12 @@
+import java_cup.runtime.*;
+
+terminal Absolute, Begin, Const, End, For, Function, If, In, Label, Nil, Object,
+         String, To, Case, Do, Else, Of, Then, Type, Until, Var, While, Xor, Write, Read, Writeln, 
+         Readln, Tipo, Not, Or, And, OpRel, OpSuma, OpMult, AsignacionVariable, AsignacionTipo,
+         FinalInstruccion, ParentesisAbierto, ParentesisCerrado, Coma, Punto, Variable, Constchar, 
+         Conststr, String, Comentarios, 
+         WhiteSpace,
+
+         Destructor, DownTo, Private, Program, Repeat, Shl, Unit, Uses, Asm,  Virtual, With, Constructor,
+         External, File, Fordward, Goto, Implementation, Inline, Interrupt, Packed, Procedure,
+         Set, Shr;
