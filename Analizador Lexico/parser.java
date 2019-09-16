@@ -326,6 +326,53 @@ public class parser extends java_cup.runtime.lr_parser {
   public int error_sym() {return 1;}
 
 
+ public void report_error(String message, Object info) {
+                    if (info instanceof Symbol) {
+                        if (((Symbol)info).left != -1 && ((Symbol)info).right != -1) {
+                            int line = (((Symbol)info).left)+1;
+                            int column = (((Symbol)info).right)+1;
+                            System.out.println(message + " " + " (line "+line+", column "+column+")");
+                        }
+                    }
+                    System.err.println(message);
+                }
+                public void syntax_error(Symbol s){
+                    String val = s.value != null ? s.value.toString() : getTokenName(s.sym);
+                    //errors.add("Error sintactico en la linea: " + s.left +" columna: "+ s.right + " simbolo: " + val);
+                    System.err.println("Error sintactico en la linea: " + s.left +" columna: "+ s.right + " simbolo: " + val);
+                }
+
+                public void unrecovered_syntax_error(Symbol s) {
+                    if (s.left < 1 || s.left < 1) return;
+                    String val = s.value != null ? s.value.toString() : getTokenName(s.sym);
+                    //errors.add("Error sintactico en la linea: " + s.left +" columna: "+ s.right + " simbolo: " + val);
+                    System.err.println("Error sintactico en la linea: " + s.left +" columna: "+ s.right + " simbolo: " + val);
+
+                }
+
+                public String getTokenName(int id){
+                    String value = sym.terminalNames[id];
+                    switch(id) {
+                        case sym.ParentesisAbierto:
+                            return "(";
+                        case sym.ParentesisCerrado:
+                            return ")";
+                        case sym.Coma:
+                            return ",";
+                        case sym.AsignacionTipo:
+                            return ":";
+                        case sym.AsignacionVariable:
+                            return ":=";
+                        case sym.FinalInstruccion:
+                            return ";";
+                        case sym.For:
+                            return "for";
+                        default:
+                            return value;  
+                    }
+                }
+
+
 /** Cup generated class to encapsulate user supplied action code.*/
 @SuppressWarnings({"rawtypes", "unchecked", "unused"})
 class CUP$parser$actions {
