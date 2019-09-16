@@ -88,6 +88,7 @@ OpMult="*"|"/"|"div"|"mod"
 //SIMBOLOS  
 AsignacionVariable=":="
 AsignacionTipo=":"
+AsignacionIgual="="
 FinalInstruccion=";"
 ParentesisAbierto="("
 ParentesisCerrado=")"
@@ -182,6 +183,7 @@ WhiteSpace=[\ \n\r\t\f]
     
     {AsignacionVariable} {System.out.println("Encontre una asignacion de variable: " + yytext() + "\n" + "Linea: " + (yyline + 1) + " Columna: " + (yycolumn + 1) + "\n");}
     {AsignacionTipo} {System.out.println("Encontre una asignacion de tipo: " + yytext() + "\n" + "Linea: " + (yyline + 1) + " Columna: " + (yycolumn + 1) + "\n");}
+    {AsignacionIgual} {System.out.println("Encontre una asignacion de Igual: " + yytext() + "\n" + "Linea: " + (yyline + 1) + " Columna: " + (yycolumn + 1) + "\n");}
     
     {FinalInstruccion} {System.out.println("Encontre el final de una instruccion: " + yytext() + "\n" + "Linea: " + (yyline + 1) + " Columna: " + (yycolumn + 1) + "\n");}
     
