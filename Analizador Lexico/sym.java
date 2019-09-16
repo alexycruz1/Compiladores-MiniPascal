@@ -19,6 +19,7 @@ public class sym {
   public static final int Else = 9;
   public static final int Variable = 30;
   public static final int Read = 14;
+  public static final int StringPattern = 37;
   public static final int AsignacionIgual = 24;
   public static final int Then = 10;
   public static final int FinalInstruccion = 25;
@@ -80,7 +81,8 @@ public class sym {
   "Program",
   "Repeat",
   "Procedure",
-  "Numero"
+  "Numero",
+  "StringPattern"
   };
 }
 

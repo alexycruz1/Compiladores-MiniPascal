@@ -1,7 +1,5 @@
 import java_cup.runtime.*;
-
 %%
-
 %unicode
 %class AnalizadorLexico
 %line
@@ -64,9 +62,11 @@ Punto="."
 Variable={Caracter}({Digito}|{Caracter})*
 
 //STRING
+StringPattern=[\"]([^\"]+)*[\"]
+
+//CONSTANTS
 Constchar=([\']([^'])[\'])|''
 Conststr=[\']([^']+)*[\']
-String=[\"]([^\"]+)*[\"]
 
 //COMMENTS
 Commentarios=\{([^}]*|[^{]*)\}
@@ -77,11 +77,11 @@ WhiteSpace=[\ \n\r\t\f]
 %%
 
 <YYINITIAL> {
+    {StringPattern} {return new Symbol(sym.StringPattern, 0, 0, yytext());}
     {Constchar} {return new Symbol(sym.Constchar, yyline, yycolumn, yytext());}
     {Conststr} {return new Symbol(sym.Conststr, yyline, yycolumn, yytext());}
-    {String} {return new Symbol(sym.String, yyline, yycolumn, yytext());}
 
-    {Commentarios} {return new Symbol(sym.Comentarios, yyline, yycolumn, yytext());}
+    {Commentarios} {}
     
     {Begin} {return new Symbol(sym.Begin, yyline, yycolumn, yytext());}
     {End} {return new Symbol(sym.End, yyline, yycolumn, yytext());}
@@ -99,6 +99,8 @@ WhiteSpace=[\ \n\r\t\f]
     {While} {return new Symbol(sym.While, yyline, yycolumn, yytext());}
     {Write} {return new Symbol(sym.Write, yyline, yycolumn, yytext());}
     {Read} {return new Symbol(sym.Read, yyline, yycolumn, yytext());}
+
+    {Numero} {return new Symbol(sym.Numero, yyline, yycolumn, yytext());}
     
     {Tipo} {return new Symbol(sym.Tipo, yyline, yycolumn, yytext());}
     
@@ -108,13 +110,13 @@ WhiteSpace=[\ \n\r\t\f]
     
     {OpSuma} {return new Symbol(sym.OpSuma, yyline, yycolumn, yytext());}
     {OpMult} {return new Symbol(sym.OpMult, yyline, yycolumn, yytext());}
-
-    {OpRel} {return new Symbol(sym.OpRel, yyline, yycolumn, yytext());}
     
+    {AsignacionIgual} {return new Symbol(sym.AsignacionIgual, yyline, yycolumn, yytext());}
     {AsignacionVariable} {return new Symbol(sym.AsignacionVariable, yyline, yycolumn, yytext());}
     {AsignacionTipo} {return new Symbol(sym.AsignacionTipo, yyline, yycolumn, yytext());}
-    {AsignacionIgual} {return new Symbol(sym.AsignacionIgual, yyline, yycolumn, yytext());}
     
+    {OpRel} {return new Symbol(sym.OpRel, yyline, yycolumn, yytext());}
+
     {FinalInstruccion} {return new Symbol(sym.FinalInstruccion, yyline, yycolumn, yytext());}
     
     {ParentesisAbierto} {return new Symbol(sym.ParentesisAbierto, yyline, yycolumn, yytext());}

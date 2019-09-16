@@ -50,7 +50,7 @@ parser code {: public void report_error(String message, Object info) {
 terminal Begin, End, For, Function, If, To, Do, Else, Then, Until, While, Write, Read, 
 		Tipo, Not, Or, And, OpRel, OpSuma, OpMult, AsignacionVariable, AsignacionTipo, 
 		AsignacionIgual, FinalInstruccion, ParentesisAbierto, ParentesisCerrado, Coma, Punto, 
-		Variable, Constchar, Conststr, Program, Repeat, Procedure, Numero;
+		Variable, Constchar, Conststr, Program, Repeat, Procedure, Numero, StringPattern;
 
 non terminal program, identifier_list, declarations, subprogram_declaration, compound_statement, type,
 		standard_type, subprogram_declarations, subprogram_head, arguments, parameter_list, optional_statements,
@@ -59,7 +59,7 @@ non terminal program, identifier_list, declarations, subprogram_declaration, com
 		relation, extra_expression;
 		
 
-program ::= Program Variable ParentesisAbierto identifier_list ParentesisCerrado FinalInstruccion declarations subprogram_declarations compound_statement Punto {: :}
+program ::= Program Variable FinalInstruccion declarations subprogram_declarations compound_statement Punto {: :}
 	;
 
 identifier_list ::= Variable {: :}
@@ -104,7 +104,7 @@ optional_statements ::= statement_list {: :}
 	;
 
 statement_list ::= statement {: :}
-	| statement_list FinalInstruccion statement {: :}
+	| statement FinalInstruccion statement_list {: :}
 	;
 
 statement ::= variable AsignacionVariable expression {: :}
