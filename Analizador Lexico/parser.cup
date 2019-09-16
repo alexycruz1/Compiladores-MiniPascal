@@ -113,22 +113,23 @@ relation ::= simple_expression {:  :}
     ;
 
 factor ::= Numero {: :}
-	| constant {: :}
 	| Not factor {: :}
-	| ParentesisAbierto simple_expression ParentesisCerrado {: :}
+	| constant {: :}
 	;
 
-factor ::= Variable tail {: :}
+/*factor ::= Variable tail {: :}
 	| Variable ParentesisAbierto expression_list ParentesisCerrado {: :}
 	| Numero {: :}
 	| ParentesisAbierto expression ParentesisCerrado {: :}
 	| Not factor {: :}
 	| constant {: :}
 	;
+*/
 
 constant ::= constant_character {: :}
 	| constant_string {: :}
 	;
+
 
 constant_character ::= Constchar {: :}
 	;
