@@ -1,12 +1,10 @@
 PROGRAM EJER37;
  VAR num1,num2:INTEGER;
+ VAR num3:INTEGER;
 BEGIN
  ClrScr;
  WRITE('Escriba dos numeros: ', var);
  READ(num1); 
- WRITE ('has', var); 
- READ (num2);
- WRITE('das', var);
     IF 5 > 4 THEN
      BEGIN
       WRITE('num1',num2);
@@ -14,7 +12,7 @@ BEGIN
      END
     ELSE
      BEGIN
-      WRITE('num1',num2);
+      WRITE('num1', num2);
       WRITE('num1', num2);
      END
 END.
