@@ -2,19 +2,10 @@ PROGRAM EJER37;
  VAR num1,num2:INTEGER;
  VAR num3:INTEGER;
 BEGIN
- ClrScr;
- WRITE('Escriba dos numeros: ', var);
- READ(num1); 
     IF 5 > 4 THEN
-     BEGIN
-      WRITE('num1',num2);
-      WRITE('num1', num2);
-     END
+     WRITE('str', sad)
     ELSE
-     BEGIN
-      WRITE('num1', num2);
-      WRITE('num1', num2);
-     END
+     WRITE('str', sad);
 END.
 
 {
