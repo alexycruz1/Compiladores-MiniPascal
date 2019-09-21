@@ -15,6 +15,7 @@ public class sym {
   public static final int Conststr = 32;
   public static final int Repeat = 34;
   public static final int If = 6;
+  public static final int Var = 38;
   public static final int ParentesisAbierto = 26;
   public static final int Else = 9;
   public static final int Variable = 30;
@@ -82,7 +83,8 @@ public class sym {
   "Repeat",
   "Procedure",
   "Numero",
-  "StringPattern"
+  "StringPattern",
+  "Var"
   };
 }
 

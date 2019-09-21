@@ -32,6 +32,7 @@ Until="until"
 While="while"
 Write="write"
 Read="read"
+Var="var"
 
 //TIPOS
 Tipo="integer" | "char" | "boolean" | "record"
@@ -99,6 +100,7 @@ WhiteSpace=[\ \n\r\t\f]
     {While} {return new Symbol(sym.While, yyline, yycolumn, yytext());}
     {Write} {return new Symbol(sym.Write, yyline, yycolumn, yytext());}
     {Read} {return new Symbol(sym.Read, yyline, yycolumn, yytext());}
+    {Var} {return new Symbol(sym.Var, yyline, yycolumn, yytext());}
 
     {Numero} {return new Symbol(sym.Numero, yyline, yycolumn, yytext());}
     
