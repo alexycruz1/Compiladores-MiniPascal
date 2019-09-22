@@ -1,0 +1,192 @@
+import java_cup.runtime.*;
+
+parser code {: public void report_error(String message, Object info) {
+                    if (info instanceof Symbol) {
+                        if (((Symbol)info).left != -1 && ((Symbol)info).right != -1) {
+                            int line = (((Symbol)info).left)+1;
+                            int column = (((Symbol)info).right)+1;
+                            System.out.println(message + " " + " (line "+line+", column "+column+")");
+                        }
+                    }
+                    System.err.println(message);
+                }
+                public void syntax_error(Symbol s){
+                    String val = s.value != null ? s.value.toString() : getTokenName(s.sym);
+                    //errors.add("Error sintactico en la linea: " + s.left +" columna: "+ s.right + " simbolo: " + val);
+                    System.err.println("Error sintactico en la linea: " + s.left +" columna: "+ s.right + " simbolo: " + val);
+                }
+
+                public void unrecovered_syntax_error(Symbol s) {
+                    if (s.left < 1 || s.left < 1) return;
+                    String val = s.value != null ? s.value.toString() : getTokenName(s.sym);
+                    //errors.add("Error sintactico en la linea: " + s.left +" columna: "+ s.right + " simbolo: " + val);
+                    //System.err.println("Error sintactico en la linea: " + s.left +" columna: "+ s.right + " simbolo: " + val);
+
+                }
+
+                public String getTokenName(int id){
+                    String value = sym.terminalNames[id];
+                    switch(id) {
+                        case sym.ParentesisAbierto:
+                            return "(";
+                        case sym.ParentesisCerrado:
+                            return ")";
+                        case sym.Coma:
+                            return ",";
+                        case sym.AsignacionTipo:
+                            return ":";
+                        case sym.AsignacionVariable:
+                            return ":=";
+                        case sym.FinalInstruccion:
+                            return ";";
+                        case sym.For:
+                            return "for";
+                        default:
+                            return value;  
+                    }
+                }
+:};
+
+terminal Begin, End, For, Function, If, To, Do, Else, Then, Until, While, Write, Read, 
+		Tipo, Not, Or, And, OpRel, OpSuma, OpMult, AsignacionVariable, AsignacionTipo, 
+		AsignacionIgual, FinalInstruccion, ParentesisAbierto, ParentesisCerrado, Coma, Punto, 
+		Variable, Constchar, Conststr, Program, Repeat, Procedure, Numero, StringPattern, Var;
+
+non terminal program, identifier_list, declarations, subprogram_declaration, compound_statement, type,
+		standard_type, subprogram_declarations, subprogram_head, arguments, parameter_list, optional_statements,
+		statement_list, statement, expression, procedure_statement, tail, expression_list, factor, mult_expression, 
+		constant, constant_character, constant_string, variable, simple_expression, write_function, read_function,
+		relation, extra_expression, final_instruccion_error;
+		
+
+program ::= Program Variable final_instruccion_error declarations subprogram_declarations compound_statement Punto {: System.out.println("Produccion #1"); :}
+	| Program final_instruccion_error declarations subprogram_declarations compound_statement Punto {: System.out.println("Produccion #1"); :}
+	;
+
+identifier_list ::= Variable {: System.out.println("Produccion #2"); :}
+	| identifier_list Coma Variable {: System.out.println("Produccion #3"); :}
+	;
+
+declarations ::= declarations Var identifier_list AsignacionTipo type FinalInstruccion {: System.out.println("Produccion #4"); :}
+	| declarations Var identifier_list error type FinalInstruccion {: parser.report_error("Error en la asignacion de tipo", null); :}
+	| {: System.out.println("Produccion #5"); :}
+	; 
+
+type ::= standard_type {: System.out.println("Produccion #6"); :}
+	| {: System.out.println("Produccion #7"); :}
+	;
+
+standard_type ::= Tipo {: System.out.println("Produccion #8"); :}
+	;
+
+subprogram_declarations ::= subprogram_declarations subprogram_declaration final_instruccion_error {: System.out.println("Produccion #9"); :}
+	| subprogram_declarations final_instruccion_error {: :}
+	| {: System.out.println("Produccion #10"); :}
+	; 
+
+subprogram_declaration ::= subprogram_head declarations compound_statement {: System.out.println("Produccion #11"); :}
+	;
+
+subprogram_head ::= Function Variable arguments AsignacionTipo standard_type final_instruccion_error {: System.out.println("Produccion #12"); :}
+	| Function Variable arguments AsignacionTipo final_instruccion_error {: :}
+	| Procedure Variable arguments FinalInstruccion {: System.out.println("Produccion #13"); :}
+	;
+
+arguments ::= ParentesisAbierto parameter_list ParentesisCerrado {: System.out.println("Produccion #14"); :}
+	|
+	;
+
+parameter_list ::= identifier_list AsignacionTipo type {: System.out.println("Produccion #15"); :}
+	| parameter_list FinalInstruccion identifier_list AsignacionTipo type {: System.out.println("Produccion #16"); :}
+	;
+
+compound_statement ::= Begin optional_statements End {: System.out.println("Produccion #17"); :}
+	;
+
+optional_statements ::= statement_list {: System.out.println("Produccion #18"); :}
+	| {: System.out.println("Produccion #19"); :} 
+	;
+
+statement_list ::= statement FinalInstruccion {: System.out.println("Produccion #20"); :}
+	| error FinalInstruccion {: parser.report_error("Error en el statement", null); :}
+	| statement_list statement FinalInstruccion {: System.out.println("Produccion #21"); :}
+	| statement_list error FinalInstruccion {: parser.report_error("Error en el statement", null); :}
+	;
+
+statement ::= variable AsignacionVariable expression {: System.out.println("Produccion #21"); :}
+	| procedure_statement {: System.out.println("Produccion #22"); :}
+	| compound_statement {: System.out.println("Produccion #23"); :}
+	| write_function {: System.out.println("Produccion #24"); :}
+	| read_function {: System.out.println("Produccion #25"); :}
+	| If expression Then statement Else statement {: System.out.println("Produccion #26"); :}
+	| If error {: parser.report_error("Error en el If", null); :}
+	| While expression Do statement {: System.out.println("Produccion #27"); :}
+	| While error {: parser.report_error("Error en el While", null); :}
+	| For Variable AsignacionVariable To expression Do statement {: System.out.println("Produccion #28"); :}
+	| For error {: parser.report_error("Error en el For", null); :}
+	| Repeat statement Until Variable AsignacionIgual expression {: System.out.println("Produccion #29"); :}
+	| Repeat error {: parser.report_error("Error en el Repeat", null); :}
+	;
+
+write_function ::= Write ParentesisAbierto constant_string Coma Variable ParentesisCerrado {: System.out.println("Produccion #30"); :}
+	;
+
+read_function ::= Read ParentesisAbierto Variable ParentesisCerrado {: System.out.println("Produccion #31"); :}
+	;
+
+variable ::= Variable tail {: System.out.println("Produccion #32"); :}
+	;
+
+tail ::= expression tail {: System.out.println("Produccion #33"); :}
+	| {: System.out.println("Produccion #34"); :}
+	;
+
+procedure_statement ::= Variable {: System.out.println("Produccion #35"); :}
+	| Variable ParentesisAbierto expression_list ParentesisCerrado {: System.out.println("Produccion #36"); :}
+	;
+
+expression_list ::= expression extra_expression {: System.out.println("Produccion #37"); :}
+	;
+
+extra_expression ::= Coma expression extra_expression {: System.out.println("Produccion #38"); :}
+	| {: System.out.println("Produccion #39"); :}
+	;
+
+simple_expression ::= simple_expression OpSuma mult_expression {: System.out.println("Produccion #40"); :}
+	| mult_expression {: System.out.println("Produccion #41"); :}
+	;
+
+mult_expression ::= mult_expression OpMult factor {: System.out.println("Produccion #42"); :}
+	| factor {: System.out.println("Produccion #43"); :}
+	;
+
+expression ::= expression And relation {: System.out.println("Produccion #44"); :}
+    | expression Or relation {: System.out.println("Produccion #45"); :}
+    | relation {: System.out.println("Produccion #46"); :}
+	| error {: parser.report_error("Error en la expresion", null); :}
+    ;
+
+relation ::= simple_expression {: System.out.println("Produccion #47"); :}
+    | simple_expression OpRel simple_expression {: System.out.println("Produccion #48"); :}
+    ;
+
+factor ::= Numero {: System.out.println("Produccion #49"); :}
+	| Not factor {: System.out.println("Produccion #50"); :}
+	| constant {: System.out.println("Produccion #51"); :}
+	| Variable ParentesisAbierto expression_list ParentesisCerrado {: System.out.println("Produccion #52"); :}
+	| ParentesisAbierto expression_list ParentesisCerrado {: System.out.println("Produccion #52"); :}
+	;
+
+constant ::= constant_character {: System.out.println("Produccion #53"); :}
+	| constant_string {: System.out.println("Produccion #54"); :}
+	;
+
+constant_character ::= Constchar {: System.out.println("Produccion #55"); :}
+	;
+
+constant_string ::= Conststr {: System.out.println("Produccion #56"); :}
+	;
+
+final_instruccion_error ::= FinalInstruccion {:  :}
+    | error {: parser.report_error("Falta final de instruccion", null); :}
+    ;

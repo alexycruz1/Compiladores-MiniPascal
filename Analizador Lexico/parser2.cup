@@ -1,0 +1,237 @@
+import java_cup.runtime.*;
+
+parser code {: public void report_error(String message, Object info) {
+                    if (info instanceof Symbol) {
+                        if (((Symbol)info).left != -1 && ((Symbol)info).right != -1) {
+                            int line = (((Symbol)info).left)+1;
+                            int column = (((Symbol)info).right)+1;
+                            System.out.println(message + " " + " (line "+line+", column "+column+")");
+                        }
+                    }
+                    System.err.println(message);
+                }
+                public void syntax_error(Symbol s){
+                    String val = s.value != null ? s.value.toString() : getTokenName(s.sym);
+                    //errors.add("Error sintactico en la linea: " + s.left +" columna: "+ s.right + " simbolo: " + val);
+                    System.err.println("Error sintactico en la linea: " + s.left +" columna: "+ s.right + " simbolo: " + val);
+                }
+
+                public void unrecovered_syntax_error(Symbol s) {
+                    if (s.left < 1 || s.left < 1) return;
+                    String val = s.value != null ? s.value.toString() : getTokenName(s.sym);
+                    //errors.add("Error sintactico en la linea: " + s.left +" columna: "+ s.right + " simbolo: " + val);
+                    System.err.println("Error sintactico en la linea: " + s.left +" columna: "+ s.right + " simbolo: " + val);
+
+                }
+
+                public String getTokenName(int id){
+                    String value = sym.terminalNames[id];
+                    switch(id) {
+                        case sym.ParentesisAbierto:
+                            return "(";
+                        case sym.ParentesisCerrado:
+                            return ")";
+                        case sym.Coma:
+                            return ",";
+                        case sym.AsignacionTipo:
+                            return ":";
+                        case sym.AsignacionVariable:
+                            return ":=";
+                        case sym.FinalInstruccion:
+                            return ";";
+                        case sym.For:
+                            return "for";
+                        default:
+                            return value;  
+                    }
+                }
+:};
+
+terminal String Begin, For, In, Return, End, Is, Null, Out, When, Else, Exit, If, Loop, Then,
+         While, Function, Procedure, GetLine, PutLine, And, Or, OpRel, OpSuma, OpMult, Tipo,
+         ParentesisAbierto, ParentesisCerrado, Variable, StringPattern, Comments, Coma, Numero, Float,
+         AsignacionTipo, AsignacionVariable, FinalInstruccion, Range, NegativeInteger, NegativeFloat, ElseIf,
+         RangeDoublePoint;
+
+non terminal subprogram_specification, subprogram_body, actual_parameter_part, declarative_part, declarative_item, 
+             basic_declaration, sequence_of_statements, statement, simple_statement, compound_statement, assignment_statement,
+             null_statement, exit_statement, procedure_call_statement, return_statement, parameter_profile,
+             formal_part, parameter_specification, defining_identifier_list, mode, parameter_and_result_profile, subtype_mark, 
+             parameter_association, expression, relation, simple_expression, mult_expression, primary, if_statement, 
+             loop_statement, iteration_scheme, loop_parameter_specification, extra_parameter, formal_part_extra_parameter,
+             subprogram_declaration, elseif_statement, range_definition, put_line, get_line, function_call,
+             final_instruccion_error;
+            
+subprogram_body ::= subprogram_specification Is declarative_part Begin sequence_of_statements End Variable final_instruccion_error {:  :}
+                | subprogram_specification Is declarative_part Begin sequence_of_statements End final_instruccion_error {:  :}
+                ;
+
+subprogram_specification ::= Procedure Variable parameter_profile {: :}
+                | Function Variable parameter_and_result_profile {:  :}
+                ;
+
+parameter_and_result_profile ::= formal_part Return Tipo {:  :}
+                | Return Tipo {:  :}
+                ;
+
+parameter_profile ::= formal_part {:  :}
+                | {:  :}
+                ;
+
+formal_part ::= ParentesisAbierto parameter_specification formal_part_extra_parameter ParentesisCerrado {:  :}
+                ;
+
+parameter_specification ::= defining_identifier_list AsignacionTipo mode Tipo {:  :}
+                | defining_identifier_list error mode Tipo {: parser.report_error("Error en asignacion de tipo", null); :}
+                ;
+
+defining_identifier_list ::= Variable {:  :}
+                | Variable Coma defining_identifier_list {:  :}
+                ;
+
+mode ::= In {:  :}
+                | In Out {:  :}
+                | Out {:  :}
+                ;
+
+expression ::= expression And relation {:  :}
+                | expression Or relation {:  :}
+                | relation {:  :}
+                | error {: parser.report_error("En expresion", null); :}
+                ;
+
+relation ::= simple_expression {:  :}
+                | simple_expression OpRel simple_expression {:  :}
+                ;
+
+simple_expression ::= simple_expression OpSuma mult_expression {:  :}
+                | mult_expression {:  :}
+                ;
+
+mult_expression ::= mult_expression OpMult primary {:  :}
+                | primary {:  :}
+                ;
+
+primary ::= Numero {:  :}
+                | Float {:  :}
+                | NegativeFloat {:  :}
+                | NegativeInteger {:  :}
+                | Variable {:  :}
+                | ParentesisAbierto simple_expression ParentesisCerrado {:  :} 
+                ;
+
+parameter_association ::= expression {:  :}
+                ;                
+
+formal_part_extra_parameter ::= final_instruccion_error parameter_specification {:  :}
+                | {:  :}
+                ;
+
+declarative_part ::= declarative_item declarative_part {:  :}
+                | {:  :}
+                ;
+
+declarative_item ::= basic_declaration {:  :}
+                | subprogram_body {:  :}
+                ;
+
+basic_declaration ::= defining_identifier_list AsignacionTipo Tipo final_instruccion_error {:  :}
+                | defining_identifier_list AsignacionVariable subtype_mark expression final_instruccion_error {:  :}
+                | subprogram_declaration {:  :}
+                | defining_identifier_list AsignacionTipo Tipo AsignacionVariable expression final_instruccion_error {:  :}
+                | defining_identifier_list AsignacionTipo Tipo AsignacionVariable function_call final_instruccion_error {:  :}
+                ;
+
+subtype_mark ::= Variable {:  :}
+                ;
+
+sequence_of_statements ::= statement sequence_of_statements {:  :}
+                | {:  :}
+                ;
+
+statement ::= simple_statement {:  :}
+                | compound_statement {:  :}
+                ;
+
+simple_statement ::= null_statement {:  :}
+                | assignment_statement {:  :}
+                | exit_statement {:  :}
+                | procedure_call_statement {:  :}
+                | return_statement {:  :}
+                | put_line {:  :}
+                | get_line {:  :}
+                ;
+
+null_statement ::= Null final_instruccion_error {:  :}
+                ;
+
+assignment_statement ::= Variable AsignacionVariable expression final_instruccion_error {:  :}
+                | Variable AsignacionVariable function_call final_instruccion_error {:  :}
+                | Variable error function_call final_instruccion_error {: parser.report_error("error de asignacion", null); :}
+                ;
+
+exit_statement ::= Exit final_instruccion_error {:  :}
+                | Exit Variable When simple_expression final_instruccion_error {:  :}
+                ;
+
+procedure_call_statement ::= Variable FinalInstruccion {:  :}
+                | Variable ParentesisAbierto actual_parameter_part ParentesisCerrado final_instruccion_error {:  :}
+                ;
+
+actual_parameter_part ::= parameter_association extra_parameter  {:  :}
+                ;
+
+extra_parameter ::= Coma parameter_association extra_parameter {:  :}
+                | {:  :}
+                ;
+
+compound_statement ::= if_statement {:  :}
+                | loop_statement {:  :}
+                ;
+
+if_statement ::= If expression Then sequence_of_statements elseif_statement End If final_instruccion_error {:  :}
+                | If error sequence_of_statements elseif_statement End If final_instruccion_error {: parser.report_error("Error en if", null); :}
+                ;
+
+elseif_statement ::= ElseIf expression Then sequence_of_statements elseif_statement {:  :}
+                | Else sequence_of_statements {:  :}
+                | {:  :}
+                ;
+                
+loop_statement ::= Variable AsignacionTipo iteration_scheme Loop sequence_of_statements End Loop Variable final_instruccion_error {:  :}
+                | Variable AsignacionTipo iteration_scheme Loop sequence_of_statements End Loop final_instruccion_error {:  :}
+                | Variable AsignacionTipo Loop sequence_of_statements End Loop Variable final_instruccion_error {:  :}
+                | Variable AsignacionTipo Loop sequence_of_statements End Loop final_instruccion_error {:  :}
+                | iteration_scheme Loop sequence_of_statements End Loop Variable final_instruccion_error {:  :}
+                | iteration_scheme Loop sequence_of_statements End Loop final_instruccion_error {:  :}
+                | Loop sequence_of_statements End Loop Variable final_instruccion_error{:  :}
+                | Loop sequence_of_statements End Loop final_instruccion_error{:  :}
+                ;
+
+iteration_scheme ::= While expression {:  :}
+                | For loop_parameter_specification {:  :}
+                | For error {: parser.report_error("Error en el for", null); :}
+                ;
+
+loop_parameter_specification ::= Variable In Tipo range_definition {:  :}
+                ;
+
+return_statement ::= Return final_instruccion_error {:  :}
+                | Return expression final_instruccion_error {:  :}
+                ;
+
+range_definition ::= Range simple_expression RangeDoublePoint simple_expression {:  :}
+                ;
+
+put_line ::= PutLine ParentesisAbierto StringPattern ParentesisCerrado final_instruccion_error {:  :}
+                ;
+
+get_line ::= GetLine ParentesisAbierto StringPattern Coma simple_expression ParentesisCerrado final_instruccion_error {:  :}
+                ;
+
+function_call ::= Variable ParentesisAbierto actual_parameter_part ParentesisCerrado {:  :}     
+                ;
+
+final_instruccion_error ::= FinalInstruccion {:  :}
+                | error {: parser.report_error("Falta final de instruccion", null); :}
+                ;
