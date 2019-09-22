@@ -7,30 +7,31 @@ begin
     read(choice);
     write('Ingrese un numero',nada);
     read(x);
-
+    {--------------While----------------------------}
     WHILE 4 < 2 or 4>100 do
         BEGIN
             if 4 > 1  then
                     BEGIN
-                        x:=100;
-                        repeat
-                            BEGIN
-                                write('de mayor a menor es ',x);
-                                x := 9 - 1;
-                            END
-                        until x = 0;
-
                         x:=0;
+                        {---------------------Repeat------------------}
                         repeat
                             BEGIN
                                 write('de menor a mayor es ',x);
                                 x := 9 - 1;
                             END
                         until x = 100;
+                        {---------------------------------------------}
+                        {---------------------For---------------------}
+                        for a := 10  to 20 do
+   
+                            begin
+                                write('value of a: ', a);
+                            end;
+                        {---------------------------------------------}
                         exit := 1;
                     END
             else
                 exit := 0;
         END;
-    
+    {-------------------------------------------}
 end.

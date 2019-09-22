@@ -145,7 +145,7 @@ statement ::= variable AsignacionVariable expression {:  :}
 	| If error {: parser.report_error("Error en el If", null); :}
 	| While expression Do statement {: :}
 	| While error {: parser.report_error("Error en el While", null); :}
-	| For Variable AsignacionVariable To expression Do statement {:  :}
+	| For Variable AsignacionVariable factor To expression Do statement {:  :}
 	| For error {: parser.report_error("Error en el For", null); :}
 	| Repeat statement Until Variable AsignacionIgual expression {:  :}
 	| Repeat error {: parser.report_error("Error en el Repeat", null); :}
@@ -230,7 +230,6 @@ factor ::= Numero:numero {: Node n = new Node("numero");
         ExpressionNode p = new ExpressionNode("Expression" , n, (ExpressionNode)exp_list);
         RESULT = p;  
 	:}
-	| Variable {: :}
 	| ParentesisAbierto expression_list:exp_list ParentesisCerrado {: RESULT = exp_list; :}
 	;
 
