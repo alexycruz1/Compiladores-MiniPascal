@@ -1,5 +1,7 @@
 #!/bin/bash
 clear
+echo ------------------------Compiling Node.java-----------------------------------------------
+javac node.java
 echo ------------------------Running Lexer-----------------------------------------------
 jflex AnalizadorLexico.flex
 echo ------------------------Running parser.cup------------------------------------------

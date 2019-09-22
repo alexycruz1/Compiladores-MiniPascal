@@ -15,7 +15,10 @@ public class Main {
   static public void main(String argv[]) {    
     try {
       parser p = new parser(new AnalizadorLexico(new FileReader(argv[0])));
-     p.parse(); 
+      p.parse(); 
+      /*Node tree = p.getMyTree();
+      tree.showTree("");
+      tree.getType();*/
     } catch (Exception e) {
       e.printStackTrace();
     }
