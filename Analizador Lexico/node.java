@@ -145,7 +145,6 @@ class Node {
         } else {
             System.out.println(tab + label + " type: " + this.getClass());
         }
-
     }
 
     public String toString() {

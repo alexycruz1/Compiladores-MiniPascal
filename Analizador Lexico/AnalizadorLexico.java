@@ -63,11 +63,11 @@ class AnalizadorLexico implements java_cup.runtime.Scanner {
     "\1\33\3\0\2\4\2\34\1\0\4\4\1\35\1\0"+
     "\1\4\1\36\1\37\2\4\1\0\1\4\1\0\1\4"+
     "\1\40\2\41\1\4\1\0\4\4\2\42\2\4\2\43"+
-    "\2\44\1\4\2\0\1\4\1\45\2\4\1\36\1\0"+
-    "\1\4\1\46\1\4\2\47\1\4\1\50";
+    "\2\44\1\4\2\0\1\4\1\45\1\46\2\4\1\36"+
+    "\1\0\1\4\1\47\1\4\2\50\1\4\1\51";
 
   private static int [] zzUnpackAction() {
-    int [] result = new int[152];
+    int [] result = new int[153];
     int offset = 0;
     offset = zzUnpackAction(ZZ_ACTION_PACKED_0, offset, result);
     return result;
@@ -109,11 +109,12 @@ class AnalizadorLexico implements java_cup.runtime.Scanner {
     "\0\176\0\u0d20\0\u0d4a\0\u0d74\0\u0d9e\0\u0dc8\0\u0df2\0\52"+
     "\0\52\0\176\0\u0e1c\0\u0e46\0\u0e70\0\u0e9a\0\u0ec4\0\u0eee"+
     "\0\52\0\176\0\u0f18\0\u0f42\0\52\0\176\0\52\0\176"+
-    "\0\u0f6c\0\u0f96\0\u0fc0\0\u0fea\0\176\0\u1014\0\u103e\0\52"+
-    "\0\u1068\0\u1092\0\176\0\u10bc\0\52\0\176\0\u10e6\0\176";
+    "\0\u0f6c\0\u0f96\0\u0fc0\0\u0fea\0\176\0\176\0\u1014\0\u103e"+
+    "\0\52\0\u1068\0\u1092\0\176\0\u10bc\0\52\0\176\0\u10e6"+
+    "\0\176";
 
   private static int [] zzUnpackRowMap() {
-    int [] result = new int[152];
+    int [] result = new int[153];
     int offset = 0;
     offset = zzUnpackRowMap(ZZ_ROWMAP_PACKED_0, offset, result);
     return result;
@@ -229,20 +230,20 @@ class AnalizadorLexico implements java_cup.runtime.Scanner {
     "\1\211\2\5\1\0\4\5\25\0\1\212\45\0\1\5"+
     "\1\0\2\5\1\130\1\5\1\0\15\5\1\0\4\5"+
     "\21\0\1\5\1\0\4\5\1\213\1\214\14\5\1\0"+
-    "\4\5\21\0\1\5\1\0\4\5\1\0\2\5\1\160"+
+    "\4\5\21\0\1\5\1\0\4\5\1\0\2\5\1\215"+
     "\12\5\1\0\4\5\21\0\1\5\1\0\4\5\1\0"+
-    "\10\5\1\215\4\5\1\0\4\5\21\0\1\5\1\0"+
-    "\4\5\1\0\12\5\1\216\2\5\1\0\4\5\21\0"+
-    "\1\5\1\0\4\5\1\0\2\5\1\217\12\5\1\0"+
+    "\10\5\1\216\4\5\1\0\4\5\21\0\1\5\1\0"+
+    "\4\5\1\0\12\5\1\217\2\5\1\0\4\5\21\0"+
+    "\1\5\1\0\4\5\1\0\2\5\1\220\12\5\1\0"+
     "\4\5\21\0\1\5\1\0\4\5\1\0\1\5\1\160"+
-    "\13\5\1\0\4\5\35\0\1\220\50\0\1\221\36\0"+
-    "\1\5\1\0\4\5\1\0\4\5\1\222\10\5\1\0"+
-    "\4\5\21\0\1\5\1\0\4\5\1\0\13\5\1\223"+
+    "\13\5\1\0\4\5\35\0\1\221\50\0\1\222\36\0"+
+    "\1\5\1\0\4\5\1\0\4\5\1\223\10\5\1\0"+
+    "\4\5\21\0\1\5\1\0\4\5\1\0\13\5\1\224"+
     "\1\5\1\0\4\5\21\0\1\5\1\0\4\5\1\0"+
-    "\6\5\1\224\6\5\1\0\4\5\31\0\1\225\41\0"+
-    "\1\5\1\0\4\5\1\0\1\5\1\226\13\5\1\0"+
-    "\4\5\21\0\1\5\1\0\4\5\1\0\5\5\1\227"+
-    "\7\5\1\0\4\5\21\0\1\5\1\0\2\5\1\230"+
+    "\6\5\1\225\6\5\1\0\4\5\31\0\1\226\41\0"+
+    "\1\5\1\0\4\5\1\0\1\5\1\227\13\5\1\0"+
+    "\4\5\21\0\1\5\1\0\4\5\1\0\5\5\1\230"+
+    "\7\5\1\0\4\5\21\0\1\5\1\0\2\5\1\231"+
     "\1\5\1\0\15\5\1\0\4\5\20\0";
 
   private static int [] zzUnpackTrans() {
@@ -291,10 +292,10 @@ class AnalizadorLexico implements java_cup.runtime.Scanner {
     "\2\1\3\0\2\1\1\11\1\1\1\0\5\1\1\0"+
     "\5\1\1\0\1\1\1\0\1\1\2\11\2\1\1\0"+
     "\4\1\1\11\3\1\1\11\1\1\1\11\2\1\2\0"+
-    "\4\1\1\11\1\0\3\1\1\11\3\1";
+    "\5\1\1\11\1\0\3\1\1\11\3\1";
 
   private static int [] zzUnpackAttribute() {
-    int [] result = new int[152];
+    int [] result = new int[153];
     int offset = 0;
     offset = zzUnpackAttribute(ZZ_ATTRIBUTE_PACKED_0, offset, result);
     return result;
@@ -756,163 +757,167 @@ class AnalizadorLexico implements java_cup.runtime.Scanner {
           case 1: 
             { System.out.println("ERROR: " + yytext() + "\n" + "Linea: " + (yyline + 1) + " Columna: " + (yycolumn + 1) + "\n");
             }
-          case 41: break;
+          case 42: break;
           case 2: 
             { return new Symbol(sym.Numero, yyline, yycolumn, yytext());
             }
-          case 42: break;
+          case 43: break;
           case 3: 
             { return new Symbol(sym.OpSuma, yyline, yycolumn, yytext());
             }
-          case 43: break;
+          case 44: break;
           case 4: 
             { return new Symbol(sym.Variable, yyline, yycolumn, yytext());
             }
-          case 44: break;
+          case 45: break;
           case 5: 
             { return new Symbol(sym.AsignacionIgual, yyline, yycolumn, yytext());
             }
-          case 45: break;
+          case 46: break;
           case 6: 
             { return new Symbol(sym.OpRel, yyline, yycolumn, yytext());
             }
-          case 46: break;
+          case 47: break;
           case 7: 
             { return new Symbol(sym.OpMult, yyline, yycolumn, yytext());
             }
-          case 47: break;
+          case 48: break;
           case 8: 
             { return new Symbol(sym.AsignacionTipo, yyline, yycolumn, yytext());
             }
-          case 48: break;
+          case 49: break;
           case 9: 
             { return new Symbol(sym.FinalInstruccion, yyline, yycolumn, yytext());
             }
-          case 49: break;
+          case 50: break;
           case 10: 
             { return new Symbol(sym.ParentesisAbierto, yyline, yycolumn, yytext());
             }
-          case 50: break;
+          case 51: break;
           case 11: 
             { return new Symbol(sym.ParentesisCerrado, yyline, yycolumn, yytext());
             }
-          case 51: break;
+          case 52: break;
           case 12: 
             { return new Symbol(sym.Coma, yyline, yycolumn, yytext());
             }
-          case 52: break;
+          case 53: break;
           case 13: 
             { return new Symbol(sym.Punto, yyline, yycolumn, yytext());
             }
-          case 53: break;
+          case 54: break;
           case 14: 
             { 
             }
-          case 54: break;
+          case 55: break;
           case 15: 
             { System.out.print(yytext());
             }
-          case 55: break;
+          case 56: break;
           case 16: 
             { return new Symbol(sym.If, yyline, yycolumn, yytext());
             }
-          case 56: break;
+          case 57: break;
           case 17: 
             { return new Symbol(sym.Do, yyline, yycolumn, yytext());
             }
-          case 57: break;
+          case 58: break;
           case 18: 
             { return new Symbol(sym.Or, yyline, yycolumn, yytext());
             }
-          case 58: break;
+          case 59: break;
           case 19: 
             { return new Symbol(sym.To, yyline, yycolumn, yytext());
             }
-          case 59: break;
+          case 60: break;
           case 20: 
             { return new Symbol(sym.AsignacionVariable, yyline, yycolumn, yytext());
             }
-          case 60: break;
+          case 61: break;
           case 21: 
             { return new Symbol(sym.StringPattern, 0, 0, yytext());
             }
-          case 61: break;
+          case 62: break;
           case 22: 
             { return new Symbol(sym.Constchar, yyline, yycolumn, yytext());
             }
-          case 62: break;
+          case 63: break;
           case 23: 
             { return new Symbol(sym.End, yyline, yycolumn, yytext());
             }
-          case 63: break;
+          case 64: break;
           case 24: 
             { return new Symbol(sym.Not, yyline, yycolumn, yytext());
             }
-          case 64: break;
+          case 65: break;
           case 25: 
             { return new Symbol(sym.For, yyline, yycolumn, yytext());
             }
-          case 65: break;
+          case 66: break;
           case 26: 
             { return new Symbol(sym.And, yyline, yycolumn, yytext());
             }
-          case 66: break;
+          case 67: break;
           case 27: 
             { return new Symbol(sym.Var, yyline, yycolumn, yytext());
             }
-          case 67: break;
+          case 68: break;
           case 28: 
             { return new Symbol(sym.Else, yyline, yycolumn, yytext());
             }
-          case 68: break;
+          case 69: break;
           case 29: 
             { return new Symbol(sym.Read, yyline, yycolumn, yytext());
             }
-          case 69: break;
+          case 70: break;
           case 30: 
             { return new Symbol(sym.Tipo, yyline, yycolumn, yytext());
             }
-          case 70: break;
+          case 71: break;
           case 31: 
             { return new Symbol(sym.Then, yyline, yycolumn, yytext());
             }
-          case 71: break;
+          case 72: break;
           case 32: 
             { return new Symbol(sym.Conststr, yyline, yycolumn, yytext());
             }
-          case 72: break;
+          case 73: break;
           case 33: 
             { return new Symbol(sym.Begin, yyline, yycolumn, yytext());
             }
-          case 73: break;
+          case 74: break;
           case 34: 
             { return new Symbol(sym.Until, yyline, yycolumn, yytext());
             }
-          case 74: break;
+          case 75: break;
           case 35: 
             { return new Symbol(sym.Write, yyline, yycolumn, yytext());
             }
-          case 75: break;
+          case 76: break;
           case 36: 
             { return new Symbol(sym.While, yyline, yycolumn, yytext());
             }
-          case 76: break;
-          case 37: 
-            { return new Symbol(sym.Repeat, yyline, yycolumn, yytext());
-            }
           case 77: break;
-          case 38: 
-            { return new Symbol(sym.Program, yyline, yycolumn, yytext());
+          case 37: 
+            { return new Symbol(sym.Record, yyline, yycolumn, yytext());
             }
           case 78: break;
-          case 39: 
-            { return new Symbol(sym.Function, yyline, yycolumn, yytext());
+          case 38: 
+            { return new Symbol(sym.Repeat, yyline, yycolumn, yytext());
             }
           case 79: break;
-          case 40: 
-            { return new Symbol(sym.Procedure, yyline, yycolumn, yytext());
+          case 39: 
+            { return new Symbol(sym.Program, yyline, yycolumn, yytext());
             }
           case 80: break;
+          case 40: 
+            { return new Symbol(sym.Function, yyline, yycolumn, yytext());
+            }
+          case 81: break;
+          case 41: 
+            { return new Symbol(sym.Procedure, yyline, yycolumn, yytext());
+            }
+          case 82: break;
           default:
             zzScanError(ZZ_NO_MATCH);
         }

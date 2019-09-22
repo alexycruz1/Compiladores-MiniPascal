@@ -1,4 +1,3 @@
-program OrdenAscendente;
 PROGRAM Ordenamiento;
 var exit: boolean;
 Var x,nada:Integer;

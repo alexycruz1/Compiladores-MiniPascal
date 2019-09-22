@@ -58,13 +58,15 @@ parser code {:
 terminal Begin, End, For, Function, If, To, Do, Else, Then, Until, While, Write, Read, 
 		Tipo, Not, Or, And, OpRel, OpSuma, OpMult, AsignacionVariable, AsignacionTipo, 
 		AsignacionIgual, FinalInstruccion, ParentesisAbierto, ParentesisCerrado, Coma, Punto, 
-		Variable, Constchar, Conststr, Program, Repeat, Procedure, Numero, StringPattern, Var;
+		Variable, Constchar, Conststr, Program, Repeat, Procedure, Numero, StringPattern, Var,
+		Record;
 
 non terminal program, identifier_list, declarations, subprogram_declaration, compound_statement, type,
 		standard_type, subprogram_declarations, subprogram_head, arguments, parameter_list, optional_statements,
 		statement_list, statement, expression, procedure_statement, tail, expression_list, factor, mult_expression, 
 		constant, constant_character, constant_string, variable, simple_expression, write_function, read_function,
-		relation, extra_expression, final_instruccion_error;
+		relation, extra_expression, final_instruccion_error, records, lista_record_values, char_declaration, 
+		integer_declaration, boolean_declaration;
 		
 
 program ::= Program Variable final_instruccion_error declarations subprogram_declarations compound_statement Punto {: System.out.println("COMPILADO CON EXIO"); :}
@@ -76,9 +78,22 @@ identifier_list ::= Variable {:  :}
 	;
 
 declarations ::= declarations Var identifier_list AsignacionTipo type FinalInstruccion {:  :}
+	| char_declaration {: :}
+	| integer_declaration {: :}
+	| boolean_declaration {: :}
 	| declarations Var identifier_list error type FinalInstruccion {: parser.report_error("Error en la asignacion de tipo", null); :}
+	| declarations records {: :}
 	| {:  :}
 	; 
+
+char_declaration ::= declarations Var identifier_list AsignacionTipo type AsignacionIgual constant_character FinalInstruccion {: :}
+	;
+
+integer_declaration ::= declarations Var identifier_list AsignacionTipo type AsignacionIgual Numero FinalInstruccion {: :}
+	;
+
+boolean_declaration ::= declarations Var identifier_list AsignacionTipo type AsignacionIgual Variable FinalInstruccion {: :}
+	;
 
 type ::= standard_type {:  :}
 	| {:  :}
@@ -215,6 +230,7 @@ factor ::= Numero:numero {: Node n = new Node("numero");
         ExpressionNode p = new ExpressionNode("Expression" , n, (ExpressionNode)exp_list);
         RESULT = p;  
 	:}
+	| Variable {: :}
 	| ParentesisAbierto expression_list:exp_list ParentesisCerrado {: RESULT = exp_list; :}
 	;
 
@@ -231,3 +247,10 @@ constant_string ::= Conststr {:  :}
 final_instruccion_error ::= FinalInstruccion {:  :}
     | error {: parser.report_error("Falta final de instruccion", null); :}
     ;
+
+records ::= Var Variable AsignacionIgual Record lista_record_values End  {:  :}
+	;
+
+lista_record_values ::= Variable AsignacionTipo Tipo FinalInstruccion lista_record_values {:  :}
+	| {: :}
+	;

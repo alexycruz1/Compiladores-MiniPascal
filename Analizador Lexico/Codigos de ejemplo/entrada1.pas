@@ -1,9 +1,22 @@
 PROGRAM EJER37;
  VAR num1,num2:INTEGER;
  VAR num3:INTEGER;
+ VAR books = RECORD
+   title:INTEGER;
+   bookID:boolean;
+ END;
+ FUNCTION max(num1, num2:INTEGER):INTEGER;
+  VAR result:INTEGER;
+  BEGIN
+   IF (4 > 5) THEN
+      result := 15
+   ELSE
+      result := 10;
+   max := 11;
+  END;
  BEGIN
   num1:=10;
-  WHILE 2>1 do
+  WHILE num1(1>5) DO
    BEGIN
     WRITE('Esta es la iteracion', num1);
     num1:=2;

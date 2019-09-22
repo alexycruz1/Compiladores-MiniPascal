@@ -33,9 +33,10 @@ While="while"
 Write="write"
 Read="read"
 Var="var"
+Record="record"
 
 //TIPOS
-Tipo="integer" | "char" | "boolean" | "record"
+Tipo="integer" | "char" | "boolean"
 
 //OPERADORES LOGICOS
 Not="not"
@@ -101,6 +102,7 @@ WhiteSpace=[\ \n\r\t\f]
     {Write} {return new Symbol(sym.Write, yyline, yycolumn, yytext());}
     {Read} {return new Symbol(sym.Read, yyline, yycolumn, yytext());}
     {Var} {return new Symbol(sym.Var, yyline, yycolumn, yytext());}
+    {Record} {return new Symbol(sym.Record, yyline, yycolumn, yytext());}
 
     {Numero} {return new Symbol(sym.Numero, yyline, yycolumn, yytext());}
     
