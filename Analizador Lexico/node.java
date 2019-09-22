@@ -140,7 +140,7 @@ class Node {
         if (sons.size() > 0) {
             System.out.println(tab + label + " type: " + this.getClass());
             for (Node son : sons) {
-                son.showTree(tab + "--? ");
+                son.showTree(tab + "---> ");
             }
         } else {
             System.out.println(tab + label + " type: " + this.getClass());
