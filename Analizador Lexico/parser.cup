@@ -27,7 +27,7 @@ parser code {:
                     if (s.left < 1 || s.left < 1) return;
                     String val = s.value != null ? s.value.toString() : getTokenName(s.sym);
                     //errors.add("Error sintactico en la linea: " + s.left +" columna: "+ s.right + " simbolo: " + val);
-                    //System.err.println("Error sintactico en la linea: " + s.left +" columna: "+ s.right + " simbolo: " + val);
+                    System.err.println("Error sintactico en la linea: " + s.left +" columna: "+ s.right + " simbolo: " + val);
 
                 }
 
@@ -158,11 +158,11 @@ expression_list ::= expression:exp extra_expression:ex_exp {: ExpressionNode p =
 	:}
 	;
 
-expression ::= expression:exp And:and relation:rel {: ExpressionNode p = new ExpressionNode("Expression", (ExpressionNode)exp, new Node(and), (ExpressionNode)rel); 
+expression ::= expression:exp And:and relation:rel {: ExpressionNode p = new ExpressionNode("Expression", (ExpressionNode)exp, new Node("and"), (ExpressionNode)rel); 
 		myTree = p;
 		RESULT = p;
 	:}
-    | expression:exp Or:or relation:rel {: ExpressionNode p = new ExpressionNode("Expression", (ExpressionNode)exp, new Node(or), (ExpressionNode)rel);
+    | expression:exp Or:or relation:rel {: ExpressionNode p = new ExpressionNode("Expression", (ExpressionNode)exp, new Node("or"), (ExpressionNode)rel);
 		myTree = p;
 		RESULT = p; 
 	:}
@@ -170,7 +170,7 @@ expression ::= expression:exp And:and relation:rel {: ExpressionNode p = new Exp
 	| error {: parser.report_error("Error en la expresion", null); :}
     ;
 
-extra_expression ::= Coma:coma expression:exp extra_expression:ex_exp {: ExpressionNode p = new ExpressionNode("Expression", new Node(coma), (ExpressionNode)exp, (ExpressionNode)ex_exp); 
+extra_expression ::= Coma:coma expression:exp extra_expression:ex_exp {: ExpressionNode p = new ExpressionNode("Expression", new Node("coma"), (ExpressionNode)exp, (ExpressionNode)ex_exp); 
 		myTree = p;
 		RESULT = p;
 	:}
@@ -191,25 +191,25 @@ simple_expression ::= simple_expression:simp_exp OpSuma:opsuma mult_expression:m
 	| mult_expression:mult_exp {: RESULT = mult_exp; :}
 	;
 
-mult_expression ::= mult_expression:mult_exp OpMult:opmult factor:fac {: ExpressionNode p = new ExpressionNode("Expression", (ExpressionNode)mult_exp, new Node(opmult), new Node(fac)); 
+mult_expression ::= mult_expression:mult_exp OpMult:opmult factor:fac {: ExpressionNode p = new ExpressionNode("Expression", (ExpressionNode)mult_exp, new Node("opmult"), new Node("fac")); 
 		myTree = p;
 		RESULT = p;
 	:}
 	| factor:fac {: RESULT = fac; :}
 	;
 
-factor ::= Numero:numero {: Node n = new Node(numero);
+factor ::= Numero:numero {: Node n = new Node("numero");
         n.setValue("Integer");
         ExpressionNode p = new ExpressionNode("Expression" , n);
         RESULT = p; 
 	:}
-	| Not:not factor:fac {: Node n = new Node(not);
+	| Not:not factor:fac {: Node n = new Node("not");
         n.setValue("Not");
         ExpressionNode p = new ExpressionNode("Expression" , n);
         RESULT = p; 
 	:}
 	| constant:cons {: RESULT = cons; :}
-	| Variable:variable ParentesisAbierto expression_list:exp_list ParentesisCerrado {: Node n = new Node(variable);
+	| Variable:variable ParentesisAbierto expression_list:exp_list ParentesisCerrado {: Node n = new Node("variable");
         n.setValue("Variable");
         ExpressionNode p = new ExpressionNode("Expression" , n, (ExpressionNode)exp_list);
         RESULT = p;  
