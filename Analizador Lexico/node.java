@@ -30,8 +30,6 @@ class Node {
         if (son != null) {
             son.setParent(this);
             this.sons.add(son);
-
-            // Print();
         }
     }
 
@@ -135,7 +133,6 @@ class Node {
     }
 
     public Node getLefterSon() {
-        // System.out.println(sons.get(0).label);
         return sons.get(0);
     }
 

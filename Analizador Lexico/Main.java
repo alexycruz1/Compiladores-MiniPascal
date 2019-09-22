@@ -17,6 +17,7 @@ public class Main {
       parser p = new parser(new AnalizadorLexico(new FileReader(argv[0])));
       p.parse(); 
       Node tree = p.getMyTree();
+      System.out.println("------------------------Printing Tree-----------------------------------------------");
       tree.showTree("");
       tree.getType();
     } catch (Exception e) {
