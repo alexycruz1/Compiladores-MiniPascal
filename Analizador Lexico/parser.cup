@@ -1,6 +1,13 @@
 import java_cup.runtime.*;
 
-parser code {: public void report_error(String message, Object info) {
+parser code {: 
+				public Node myTree = new Node("INIT");
+
+                public Node getMyTree(){
+                    return myTree;
+                }
+
+				public void report_error(String message, Object info) {
                     if (info instanceof Symbol) {
                         if (((Symbol)info).left != -1 && ((Symbol)info).right != -1) {
                             int line = (((Symbol)info).left)+1;
@@ -145,36 +152,69 @@ procedure_statement ::= Variable {: System.out.println("Produccion #35"); :}
 	| Variable ParentesisAbierto expression_list ParentesisCerrado {: System.out.println("Produccion #36"); :}
 	;
 
-expression_list ::= expression extra_expression {: System.out.println("Produccion #37"); :}
+expression_list ::= expression:exp extra_expression:ex_exp {: ExpressionNode p = new ExpressionNode("Expression", (ExpressionNode)exp, (ExpressionNode)ex_exp); 
+		myTree = p;
+		RESULT = p;
+	:}
 	;
 
-extra_expression ::= Coma expression extra_expression {: System.out.println("Produccion #38"); :}
-	| {: System.out.println("Produccion #39"); :}
-	;
-
-simple_expression ::= simple_expression OpSuma mult_expression {: System.out.println("Produccion #40"); :}
-	| mult_expression {: System.out.println("Produccion #41"); :}
-	;
-
-mult_expression ::= mult_expression OpMult factor {: System.out.println("Produccion #42"); :}
-	| factor {: System.out.println("Produccion #43"); :}
-	;
-
-expression ::= expression And relation {: System.out.println("Produccion #44"); :}
-    | expression Or relation {: System.out.println("Produccion #45"); :}
-    | relation {: System.out.println("Produccion #46"); :}
+expression ::= expression:exp And:and relation:rel {: ExpressionNode p = new ExpressionNode("Expression", (ExpressionNode)exp, new Node(and), (ExpressionNode)rel); 
+		myTree = p;
+		RESULT = p;
+	:}
+    | expression:exp Or:or relation:rel {: ExpressionNode p = new ExpressionNode("Expression", (ExpressionNode)exp, new Node(or), (ExpressionNode)rel);
+		myTree = p;
+		RESULT = p; 
+	:}
+    | relation:rel {: RESULT = rel; :}
 	| error {: parser.report_error("Error en la expresion", null); :}
     ;
 
-relation ::= simple_expression {: System.out.println("Produccion #47"); :}
-    | simple_expression OpRel simple_expression {: System.out.println("Produccion #48"); :}
+extra_expression ::= Coma:coma expression:exp extra_expression:ex_exp {: ExpressionNode p = new ExpressionNode("Expression", new Node(coma), (ExpressionNode)exp, (ExpressionNode)ex_exp); 
+		myTree = p;
+		RESULT = p;
+	:}
+	| {: System.out.println("Produccion #39"); :}
+	;
+
+relation ::= simple_expression:simp_exp {: RESULT = simp_exp; :}
+    | simple_expression:simp_exp OpRel:oprel simple_expression:simp_exp {: ExpressionNode p = new ExpressionNode("Expression", (ExpressionNode)simp_exp, (ExpressionNode)oprel, (ExpressionNode)simp_exp); 
+		myTree = p;
+		RESULT = p;
+	:}
     ;
 
-factor ::= Numero {: System.out.println("Produccion #49"); :}
-	| Not factor {: System.out.println("Produccion #50"); :}
-	| constant {: System.out.println("Produccion #51"); :}
-	| Variable ParentesisAbierto expression_list ParentesisCerrado {: System.out.println("Produccion #52"); :}
-	| ParentesisAbierto expression_list ParentesisCerrado {: System.out.println("Produccion #52"); :}
+simple_expression ::= simple_expression:simp_exp OpSuma:opsuma mult_expression:mult_exp {: ExpressionNode p = new ExpressionNode("Expression", (ExpressionNode)simp_exp, (ExpressionNode)opsuma, (ExpressionNode)mult_exp); 
+		myTree = p;
+		RESULT = p;
+	:}
+	| mult_expression:mult_exp {: RESULT = mult_exp; :}
+	;
+
+mult_expression ::= mult_expression:mult_exp OpMult:opmult factor:fac {: ExpressionNode p = new ExpressionNode("Expression", (ExpressionNode)mult_exp, new Node(opmult), new Node(fac)); 
+		myTree = p;
+		RESULT = p;
+	:}
+	| factor:fac {: RESULT = fac; :}
+	;
+
+factor ::= Numero:numero {: Node n = new Node(numero);
+        n.setValue("Integer");
+        ExpressionNode p = new ExpressionNode("Expression" , n);
+        RESULT = p; 
+	:}
+	| Not:not factor:fac {: Node n = new Node(not);
+        n.setValue("Not");
+        ExpressionNode p = new ExpressionNode("Expression" , n);
+        RESULT = p; 
+	:}
+	| constant:cons {: RESULT = cons; :}
+	| Variable:variable ParentesisAbierto expression_list:exp_list ParentesisCerrado {: Node n = new Node(variable);
+        n.setValue("Variable");
+        ExpressionNode p = new ExpressionNode("Expression" , n, (ExpressionNode)exp_list);
+        RESULT = p;  
+	:}
+	| ParentesisAbierto expression_list:exp_list ParentesisCerrado {: RESULT = exp_list; :}
 	;
 
 constant ::= constant_character {: System.out.println("Produccion #53"); :}
