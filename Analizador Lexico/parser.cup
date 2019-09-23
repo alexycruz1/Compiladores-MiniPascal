@@ -49,6 +49,14 @@ parser code {:
                             return ";";
                         case sym.For:
                             return "for";
+						case sym.While:
+                            return "while";
+						case sym.Repeat:
+                            return "repeat";
+						case sym.If:
+                            return "if";
+						case sym.AsignacionIgual:
+                            return "=";	
                         default:
                             return value;  
                     }
@@ -69,8 +77,8 @@ non terminal program, identifier_list, declarations, subprogram_declaration, com
 		integer_declaration, boolean_declaration;
 		
 
-program ::= Program Variable final_instruccion_error declarations subprogram_declarations compound_statement Punto {: System.out.println("COMPILADO CON EXIO"); :}
-	| Program final_instruccion_error declarations subprogram_declarations compound_statement Punto {: System.out.println("COMPILADO CON EXIO"); :}
+program ::= Program Variable final_instruccion_error declarations subprogram_declarations compound_statement Punto {: System.out.println("COMPILADO CON EXITO"); :}
+	| Program final_instruccion_error declarations subprogram_declarations compound_statement Punto {: System.out.println("COMPILADO CON EXITO"); :}
 	;
 
 identifier_list ::= Variable {:  :}
@@ -145,13 +153,14 @@ statement ::= variable AsignacionVariable expression {:  :}
 	| If error {: parser.report_error("Error en el If", null); :}
 	| While expression Do statement {: :}
 	| While error {: parser.report_error("Error en el While", null); :}
-	| For Variable AsignacionVariable To expression Do statement {:  :}
+	| For Variable AsignacionVariable Numero To expression Do statement {:  :}
 	| For error {: parser.report_error("Error en el For", null); :}
 	| Repeat statement Until Variable AsignacionIgual expression {:  :}
 	| Repeat error {: parser.report_error("Error en el Repeat", null); :}
 	;
 
 write_function ::= Write ParentesisAbierto constant_string Coma Variable ParentesisCerrado {:  :}
+	| Write ParentesisAbierto constant_string ParentesisCerrado {: :}
 	;
 
 read_function ::= Read ParentesisAbierto Variable ParentesisCerrado {:  :}
@@ -186,7 +195,7 @@ expression ::= expression:exp And:and relation:rel {: ExpressionNode p = new Exp
 	| error {: parser.report_error("Error en la expresion", null); :}
     ;
 
-extra_expression ::= Coma:coma expression:exp extra_expression:ex_exp {: ExpressionNode p = new ExpressionNode("Expression", new Node("coma"), (ExpressionNode)exp, (ExpressionNode)ex_exp); 
+extra_expression ::= Coma expression:exp extra_expression:ex_exp {: ExpressionNode p = new ExpressionNode("Expression", (ExpressionNode)exp, (ExpressionNode)ex_exp); 
 		myTree = p;
 		RESULT = p;
 	:}
@@ -194,44 +203,51 @@ extra_expression ::= Coma:coma expression:exp extra_expression:ex_exp {: Express
 	;
 
 relation ::= simple_expression:simp_exp {: RESULT = simp_exp; :}
-    | simple_expression:simp_exp OpRel:oprel simple_expression:simp_exp2 {: ExpressionNode p = new ExpressionNode("Expression", (ExpressionNode)simp_exp, new Node("oprel"), (ExpressionNode)simp_exp2); 
+    | simple_expression:simp_exp OpRel:oprel simple_expression:simp_exp2 {: ExpressionNode p = new ExpressionNode("Expression", (ExpressionNode)simp_exp, new Node("Operador Relacional"), (ExpressionNode)simp_exp2); 
+		myTree = p;
+		RESULT = p;
+	:}
+	| simple_expression:simp_exp AsignacionIgual:asignacion_igual simple_expression:simp_exp2 {: ExpressionNode p = new ExpressionNode("Expression", (ExpressionNode)simp_exp, new Node("Asignacion Igual"), (ExpressionNode)simp_exp2); 
 		myTree = p;
 		RESULT = p;
 	:}
     ;
 
-simple_expression ::= simple_expression:simp_exp OpSuma:opsuma mult_expression:mult_exp {: ExpressionNode p = new ExpressionNode("Expression", (ExpressionNode)simp_exp, new Node("opsuma"), (ExpressionNode)mult_exp); 
+simple_expression ::= simple_expression:simp_exp OpSuma:opsuma mult_expression:mult_exp {: ExpressionNode p = new ExpressionNode("Expression", (ExpressionNode)simp_exp, new Node("Operador Suma"), (ExpressionNode)mult_exp); 
 		myTree = p;
 		RESULT = p;
 	:}
 	| mult_expression:mult_exp {: RESULT = mult_exp; :}
 	;
 
-mult_expression ::= mult_expression:mult_exp OpMult:opmult factor:fac {: ExpressionNode p = new ExpressionNode("Expression", (ExpressionNode)mult_exp, new Node("opmult"), new Node("fac")); 
+mult_expression ::= mult_expression:mult_exp OpMult:opmult factor:fac {: ExpressionNode p = new ExpressionNode("Expression", (ExpressionNode)mult_exp, new Node("Operador Multiplicacion"), new Node("Factor")); 
 		myTree = p;
 		RESULT = p;
 	:}
 	| factor:fac {: RESULT = fac; :}
 	;
 
-factor ::= Numero:numero {: Node n = new Node("numero");
+factor ::= Numero:numero {: Node n = new Node("Numero");
         n.setValue("Integer");
         ExpressionNode p = new ExpressionNode("Expression" , n);
-        RESULT = p; 
+        RESULT = p;
 	:}
-	| Not:not factor:fac {: Node n = new Node("not");
+	| Variable:var {: Node n = new Node("Variable");
+		n.setValue("Variable");
+		ExpressionNode p = new ExpressionNode("Expression", n);
+		RESULT = p;
+	:}
+	| Not:not factor:fac {: Node n = new Node("Not");
         n.setValue("Not");
-        ExpressionNode p = new ExpressionNode("Expression" , n);
+        ExpressionNode p = new ExpressionNode("Expression" , n, new Node("Factor"));
         RESULT = p; 
 	:}
 	| constant:cons {: RESULT = cons; :}
-	| Variable:variable ParentesisAbierto expression_list:exp_list ParentesisCerrado {: Node n = new Node("variable");
-        n.setValue("Variable");
-        ExpressionNode p = new ExpressionNode("Expression" , n, (ExpressionNode)exp_list);
-        RESULT = p;  
+	| ParentesisAbierto expression_list:exp_list ParentesisCerrado {:  
+		/*ArrayList n = new ArrayList();
+		n.addAll((ArrayList)exp_list);
+		RESULT = n;*/
 	:}
-	| Variable {: :}
-	| ParentesisAbierto expression_list:exp_list ParentesisCerrado {: RESULT = exp_list; :}
 	;
 
 constant ::= constant_character {:  :}

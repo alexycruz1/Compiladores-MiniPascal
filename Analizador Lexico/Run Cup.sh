@@ -1,6 +1,8 @@
 #!/bin/bash
 clear
 echo ------------------------Compiling Node.java-----------------------------------------------
+javac IfNode.java
+javac ExpressionNode.java
 javac node.java
 echo ------------------------Running Lexer-----------------------------------------------
 jflex AnalizadorLexico.flex
