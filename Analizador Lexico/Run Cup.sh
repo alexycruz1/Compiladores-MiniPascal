@@ -4,6 +4,10 @@ echo ------------------------Compiling Node.java--------------------------------
 javac IfNode.java
 javac ExpressionNode.java
 javac node.java
+javac WhileNode.java
+javac ForNode.java
+javac ElseNode.java
+javac RepeatNode.java
 echo ------------------------Running Lexer-----------------------------------------------
 jflex AnalizadorLexico.flex
 echo ------------------------Running parser.cup------------------------------------------

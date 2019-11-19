@@ -1,13 +1,13 @@
 import java.util.ArrayList;
 
 class IfNode extends Node {
-    public IfNode(String label, ExpressionNode condicion) {
+    public IfNode(String label) {
         super(label);
-        this.addSon(condicion);
     }
 
     public void createBodyNode(ArrayList<Node> bodyNodes) {
         Node BodyNode = new Node("Body");
+        System.out.println(bodyNodes);
         for (Node n : bodyNodes) {
             BodyNode.addSon(n);
         }
@@ -24,7 +24,7 @@ class IfNode extends Node {
         this.addSon(BodyNode);
     }
 
-    public String getType() {
+    /*public String getType() {
         ArrayList<String> returns1 = new ArrayList();
         for (Node n : getChildAt(1).getSons()) {
             if (n.label == "Return") {
@@ -99,5 +99,5 @@ class IfNode extends Node {
 
             }
         }
-    }
+    }*/
 }

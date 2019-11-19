@@ -138,24 +138,57 @@ optional_statements ::= statement_list {:  :}
 	| {:  :} 
 	;
 
-statement_list ::= statement FinalInstruccion {:  :}
+statement_list ::= statement:state FinalInstruccion {: RESULT = state; :}
 	| error FinalInstruccion {: parser.report_error("Error en el statement", null); :}
-	| statement_list statement FinalInstruccion {:  :}
+	| statement_list:state_list statement:state FinalInstruccion {: 
+		ArrayList n = new ArrayList();
+		
+		n.add(state);
+		n.addAll((ArrayList)state_list);
+
+		RESULT = n;
+	:}
 	| statement_list error FinalInstruccion {: parser.report_error("Error en el statement", null); :}
 	;
 
-statement ::= variable AsignacionVariable expression {:  :}
+statement ::= variable:var AsignacionVariable expression:exp {: ExpressionNode p = new ExpressionNode("Expression", (ExpressionNode)var, (ExpressionNode)exp); 
+		myTree = p;
+		RESULT = p;
+	:}
 	| procedure_statement {:  :}
 	| compound_statement {:  :}
 	| write_function {:  :}
 	| read_function {:  :}
-	| If expression Then statement Else statement {:  :}
+	| If expression Then statement:if_state Else statement:if_else_state {: 
+		IfNode ifNode = new IfNode("If");
+	 	
+		/*ifNode.createBodyNode((ArrayList)if_state);         
+        ifNode.createElseNode((ArrayList)if_else_state);*/
+        
+		myTree = ifNode;
+		RESULT = ifNode;
+	:}
 	| If error {: parser.report_error("Error en el If", null); :}
-	| While expression Do statement {: :}
+	| While expression:exp Do statement:state {: 
+		WhileNode whileNode = new WhileNode(new ExpressionNode("Expression", (ExpressionNode)exp), (Node)state);
+
+		myTree = whileNode;
+		RESULT = whileNode;
+	:}
 	| While error {: parser.report_error("Error en el While", null); :}
-	| For Variable AsignacionVariable factor To expression Do statement {:  :}
+	| For Variable AsignacionVariable factor To expression:exp Do statement:state {:  
+		ForNode forNode = new ForNode(new Node("Variable"), new Node("Factor"), new ExpressionNode("Expression", (ExpressionNode)exp), (Node)state);
+
+		myTree = forNode;
+		RESULT = forNode;
+	:}
 	| For error {: parser.report_error("Error en el For", null); :}
-	| Repeat statement Until Variable AsignacionIgual expression {:  :}
+	| Repeat statement:state Until Variable AsignacionIgual expression:exp {: 
+		RepeatNode repeatNode = new RepeatNode((Node)state, new Node("Variable"), new ExpressionNode("Expression", (ExpressionNode)exp));
+	
+		myTree = repeatNode;
+		RESULT = repeatNode;
+	 :}
 	| Repeat error {: parser.report_error("Error en el Repeat", null); :}
 	;
 
@@ -243,10 +276,9 @@ factor ::= Numero:numero {: Node n = new Node("Numero");
         RESULT = p; 
 	:}
 	| constant:cons {: RESULT = cons; :}
-	| ParentesisAbierto expression_list:exp_list ParentesisCerrado {:  
-		/*ArrayList n = new ArrayList();
-		n.addAll((ArrayList)exp_list);
-		RESULT = n;*/
+	| ParentesisAbierto expression_list:exp_list ParentesisCerrado {: ExpressionNode p = new ExpressionNode("Expression", (ExpressionNode)exp_list); 
+		myTree = p;
+		RESULT = p; 
 	:}
 	;
 

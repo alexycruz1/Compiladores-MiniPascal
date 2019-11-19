@@ -11,7 +11,10 @@ PROGRAM EJER37;
   VAR result:INTEGER;
   BEGIN
    IF (4 > 5) THEN
-      result := 15
+   BEGIN
+      result := 15;
+      result := 15;
+   END
    ELSE
       result := 10;
    max := 11;
