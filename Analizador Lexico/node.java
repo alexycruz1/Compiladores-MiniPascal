@@ -30,8 +30,6 @@ class Node {
         if (son != null) {
             son.setParent(this);
             this.sons.add(son);
-
-            // Print();
         }
     }
 
@@ -135,7 +133,6 @@ class Node {
     }
 
     public Node getLefterSon() {
-        // System.out.println(sons.get(0).label);
         return sons.get(0);
     }
 
@@ -143,12 +140,11 @@ class Node {
         if (sons.size() > 0) {
             System.out.println(tab + label + " type: " + this.getClass());
             for (Node son : sons) {
-                son.showTree(tab + "--? ");
+                son.showTree(tab + "---> ");
             }
         } else {
             System.out.println(tab + label + " type: " + this.getClass());
         }
-
     }
 
     public String toString() {

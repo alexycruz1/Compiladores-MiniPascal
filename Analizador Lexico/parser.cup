@@ -1,6 +1,14 @@
 import java_cup.runtime.*;
+import java.util.ArrayList;
 
-parser code {: public void report_error(String message, Object info) {
+parser code {: 
+				public Node myTree = new Node("INIT");
+
+                public Node getMyTree(){
+                    return myTree;
+                }
+
+				public void report_error(String message, Object info) {
                     if (info instanceof Symbol) {
                         if (((Symbol)info).left != -1 && ((Symbol)info).right != -1) {
                             int line = (((Symbol)info).left)+1;
@@ -20,7 +28,7 @@ parser code {: public void report_error(String message, Object info) {
                     if (s.left < 1 || s.left < 1) return;
                     String val = s.value != null ? s.value.toString() : getTokenName(s.sym);
                     //errors.add("Error sintactico en la linea: " + s.left +" columna: "+ s.right + " simbolo: " + val);
-                    //System.err.println("Error sintactico en la linea: " + s.left +" columna: "+ s.right + " simbolo: " + val);
+                    System.err.println("Error sintactico en la linea: " + s.left +" columna: "+ s.right + " simbolo: " + val);
 
                 }
 
@@ -41,6 +49,14 @@ parser code {: public void report_error(String message, Object info) {
                             return ";";
                         case sym.For:
                             return "for";
+						case sym.While:
+                            return "while";
+						case sym.Repeat:
+                            return "repeat";
+						case sym.If:
+                            return "if";
+						case sym.AsignacionIgual:
+                            return "=";	
                         default:
                             return value;  
                     }
@@ -50,143 +66,239 @@ parser code {: public void report_error(String message, Object info) {
 terminal Begin, End, For, Function, If, To, Do, Else, Then, Until, While, Write, Read, 
 		Tipo, Not, Or, And, OpRel, OpSuma, OpMult, AsignacionVariable, AsignacionTipo, 
 		AsignacionIgual, FinalInstruccion, ParentesisAbierto, ParentesisCerrado, Coma, Punto, 
-		Variable, Constchar, Conststr, Program, Repeat, Procedure, Numero, StringPattern, Var;
+		Variable, Constchar, Conststr, Program, Repeat, Procedure, Numero, StringPattern, Var,
+		Record;
 
 non terminal program, identifier_list, declarations, subprogram_declaration, compound_statement, type,
 		standard_type, subprogram_declarations, subprogram_head, arguments, parameter_list, optional_statements,
 		statement_list, statement, expression, procedure_statement, tail, expression_list, factor, mult_expression, 
 		constant, constant_character, constant_string, variable, simple_expression, write_function, read_function,
-		relation, extra_expression, final_instruccion_error;
+		relation, extra_expression, final_instruccion_error, records, lista_record_values, char_declaration, 
+		integer_declaration, boolean_declaration;
 		
 
-program ::= Program Variable final_instruccion_error declarations subprogram_declarations compound_statement Punto {: System.out.println("Produccion #1"); :}
-	| Program final_instruccion_error declarations subprogram_declarations compound_statement Punto {: System.out.println("Produccion #1"); :}
+program ::= Program Variable final_instruccion_error declarations subprogram_declarations compound_statement Punto {: System.out.println("COMPILADO CON EXITO"); :}
+	| Program final_instruccion_error declarations subprogram_declarations compound_statement Punto {: System.out.println("COMPILADO CON EXITO"); :}
 	;
 
-identifier_list ::= Variable {: System.out.println("Produccion #2"); :}
-	| identifier_list Coma Variable {: System.out.println("Produccion #3"); :}
+identifier_list ::= Variable {:  :}
+	| identifier_list Coma Variable {:  :}
 	;
 
-declarations ::= declarations Var identifier_list AsignacionTipo type FinalInstruccion {: System.out.println("Produccion #4"); :}
+declarations ::= declarations Var identifier_list AsignacionTipo type FinalInstruccion {:  :}
+	| char_declaration {: :}
+	| integer_declaration {: :}
+	| boolean_declaration {: :}
 	| declarations Var identifier_list error type FinalInstruccion {: parser.report_error("Error en la asignacion de tipo", null); :}
-	| {: System.out.println("Produccion #5"); :}
+	| declarations records {: :}
+	| {:  :}
 	; 
 
-type ::= standard_type {: System.out.println("Produccion #6"); :}
-	| {: System.out.println("Produccion #7"); :}
+char_declaration ::= declarations Var identifier_list AsignacionTipo type AsignacionIgual constant_character FinalInstruccion {: :}
 	;
 
-standard_type ::= Tipo {: System.out.println("Produccion #8"); :}
+integer_declaration ::= declarations Var identifier_list AsignacionTipo type AsignacionIgual Numero FinalInstruccion {: :}
 	;
 
-subprogram_declarations ::= subprogram_declarations subprogram_declaration final_instruccion_error {: System.out.println("Produccion #9"); :}
+boolean_declaration ::= declarations Var identifier_list AsignacionTipo type AsignacionIgual Variable FinalInstruccion {: :}
+	;
+
+type ::= standard_type {:  :}
+	| {:  :}
+	;
+
+standard_type ::= Tipo {:  :}
+	;
+
+subprogram_declarations ::= subprogram_declarations subprogram_declaration final_instruccion_error {:  :}
 	| subprogram_declarations final_instruccion_error {: :}
-	| {: System.out.println("Produccion #10"); :}
+	| {:  :}
 	; 
 
-subprogram_declaration ::= subprogram_head declarations compound_statement {: System.out.println("Produccion #11"); :}
+subprogram_declaration ::= subprogram_head declarations compound_statement {:  :}
 	;
 
-subprogram_head ::= Function Variable arguments AsignacionTipo standard_type final_instruccion_error {: System.out.println("Produccion #12"); :}
+subprogram_head ::= Function Variable arguments AsignacionTipo standard_type final_instruccion_error {:  :}
 	| Function Variable arguments AsignacionTipo final_instruccion_error {: :}
-	| Procedure Variable arguments FinalInstruccion {: System.out.println("Produccion #13"); :}
+	| Procedure Variable arguments FinalInstruccion {:  :}
 	;
 
-arguments ::= ParentesisAbierto parameter_list ParentesisCerrado {: System.out.println("Produccion #14"); :}
+arguments ::= ParentesisAbierto parameter_list ParentesisCerrado {:  :}
 	|
 	;
 
-parameter_list ::= identifier_list AsignacionTipo type {: System.out.println("Produccion #15"); :}
-	| parameter_list FinalInstruccion identifier_list AsignacionTipo type {: System.out.println("Produccion #16"); :}
+parameter_list ::= identifier_list AsignacionTipo type {:  :}
+	| parameter_list FinalInstruccion identifier_list AsignacionTipo type {:  :}
 	;
 
-compound_statement ::= Begin optional_statements End {: System.out.println("Produccion #17"); :}
+compound_statement ::= Begin optional_statements End {:  :}
 	;
 
-optional_statements ::= statement_list {: System.out.println("Produccion #18"); :}
-	| {: System.out.println("Produccion #19"); :} 
+optional_statements ::= statement_list {:  :}
+	| {:  :} 
 	;
 
-statement_list ::= statement FinalInstruccion {: System.out.println("Produccion #20"); :}
+statement_list ::= statement:state FinalInstruccion {: RESULT = state; :}
 	| error FinalInstruccion {: parser.report_error("Error en el statement", null); :}
-	| statement_list statement FinalInstruccion {: System.out.println("Produccion #21"); :}
+	| statement_list:state_list statement:state FinalInstruccion {: 
+		ArrayList n = new ArrayList();
+		
+		n.add(state);
+		n.addAll((ArrayList)state_list);
+
+		RESULT = n;
+	:}
 	| statement_list error FinalInstruccion {: parser.report_error("Error en el statement", null); :}
 	;
 
-statement ::= variable AsignacionVariable expression {: System.out.println("Produccion #21"); :}
-	| procedure_statement {: System.out.println("Produccion #22"); :}
-	| compound_statement {: System.out.println("Produccion #23"); :}
-	| write_function {: System.out.println("Produccion #24"); :}
-	| read_function {: System.out.println("Produccion #25"); :}
-	| If expression Then statement Else statement {: System.out.println("Produccion #26"); :}
+statement ::= variable:var AsignacionVariable expression:exp {: ExpressionNode p = new ExpressionNode("Expression", (ExpressionNode)var, (ExpressionNode)exp); 
+		myTree = p;
+		RESULT = p;
+	:}
+	| procedure_statement {:  :}
+	| compound_statement {:  :}
+	| write_function {:  :}
+	| read_function {:  :}
+	| If expression Then statement:if_state Else statement:if_else_state {: 
+		IfNode ifNode = new IfNode("If");
+	 	
+		/*ifNode.createBodyNode((ArrayList)if_state);         
+        ifNode.createElseNode((ArrayList)if_else_state);*/
+        
+		myTree = ifNode;
+		RESULT = ifNode;
+	:}
 	| If error {: parser.report_error("Error en el If", null); :}
-	| While expression Do statement {: System.out.println("Produccion #27"); :}
+	| While expression:exp Do statement:state {: 
+		WhileNode whileNode = new WhileNode(new ExpressionNode("Expression", (ExpressionNode)exp), (Node)state);
+
+		myTree = whileNode;
+		RESULT = whileNode;
+	:}
 	| While error {: parser.report_error("Error en el While", null); :}
-	| For Variable AsignacionVariable To expression Do statement {: System.out.println("Produccion #28"); :}
+	| For Variable AsignacionVariable factor To expression:exp Do statement:state {:  
+		ForNode forNode = new ForNode(new Node("Variable"), new Node("Factor"), new ExpressionNode("Expression", (ExpressionNode)exp), (Node)state);
+
+		myTree = forNode;
+		RESULT = forNode;
+	:}
 	| For error {: parser.report_error("Error en el For", null); :}
-	| Repeat statement Until Variable AsignacionIgual expression {: System.out.println("Produccion #29"); :}
+	| Repeat statement:state Until Variable AsignacionIgual expression:exp {: 
+		RepeatNode repeatNode = new RepeatNode((Node)state, new Node("Variable"), new ExpressionNode("Expression", (ExpressionNode)exp));
+	
+		myTree = repeatNode;
+		RESULT = repeatNode;
+	 :}
 	| Repeat error {: parser.report_error("Error en el Repeat", null); :}
 	;
 
-write_function ::= Write ParentesisAbierto constant_string Coma Variable ParentesisCerrado {: System.out.println("Produccion #30"); :}
+write_function ::= Write ParentesisAbierto constant_string Coma Variable ParentesisCerrado {:  :}
+	| Write ParentesisAbierto constant_string ParentesisCerrado {: :}
 	;
 
-read_function ::= Read ParentesisAbierto Variable ParentesisCerrado {: System.out.println("Produccion #31"); :}
+read_function ::= Read ParentesisAbierto Variable ParentesisCerrado {:  :}
 	;
 
-variable ::= Variable tail {: System.out.println("Produccion #32"); :}
+variable ::= Variable tail {:  :}
 	;
 
-tail ::= expression tail {: System.out.println("Produccion #33"); :}
-	| {: System.out.println("Produccion #34"); :}
+tail ::= expression tail {:  :}
+	| {:  :}
 	;
 
-procedure_statement ::= Variable {: System.out.println("Produccion #35"); :}
-	| Variable ParentesisAbierto expression_list ParentesisCerrado {: System.out.println("Produccion #36"); :}
+procedure_statement ::= Variable {:  :}
+	| Variable ParentesisAbierto expression_list ParentesisCerrado {:  :}
 	;
 
-expression_list ::= expression extra_expression {: System.out.println("Produccion #37"); :}
+expression_list ::= expression:exp extra_expression:ex_exp {: ExpressionNode p = new ExpressionNode("Expression", (ExpressionNode)exp, (ExpressionNode)ex_exp); 
+		myTree = p;
+		RESULT = p;
+	:}
 	;
 
-extra_expression ::= Coma expression extra_expression {: System.out.println("Produccion #38"); :}
-	| {: System.out.println("Produccion #39"); :}
-	;
-
-simple_expression ::= simple_expression OpSuma mult_expression {: System.out.println("Produccion #40"); :}
-	| mult_expression {: System.out.println("Produccion #41"); :}
-	;
-
-mult_expression ::= mult_expression OpMult factor {: System.out.println("Produccion #42"); :}
-	| factor {: System.out.println("Produccion #43"); :}
-	;
-
-expression ::= expression And relation {: System.out.println("Produccion #44"); :}
-    | expression Or relation {: System.out.println("Produccion #45"); :}
-    | relation {: System.out.println("Produccion #46"); :}
+expression ::= expression:exp And:and relation:rel {: ExpressionNode p = new ExpressionNode("Expression", (ExpressionNode)exp, new Node("and"), (ExpressionNode)rel); 
+		myTree = p;
+		RESULT = p;
+	:}
+    | expression:exp Or:or relation:rel {: ExpressionNode p = new ExpressionNode("Expression", (ExpressionNode)exp, new Node("or"), (ExpressionNode)rel);
+		myTree = p;
+		RESULT = p; 
+	:}
+    | relation:rel {: RESULT = rel; :}
 	| error {: parser.report_error("Error en la expresion", null); :}
     ;
 
-relation ::= simple_expression {: System.out.println("Produccion #47"); :}
-    | simple_expression OpRel simple_expression {: System.out.println("Produccion #48"); :}
+extra_expression ::= Coma expression:exp extra_expression:ex_exp {: ExpressionNode p = new ExpressionNode("Expression", (ExpressionNode)exp, (ExpressionNode)ex_exp); 
+		myTree = p;
+		RESULT = p;
+	:}
+	| {:  :}
+	;
+
+relation ::= simple_expression:simp_exp {: RESULT = simp_exp; :}
+    | simple_expression:simp_exp OpRel:oprel simple_expression:simp_exp2 {: ExpressionNode p = new ExpressionNode("Expression", (ExpressionNode)simp_exp, new Node("Operador Relacional"), (ExpressionNode)simp_exp2); 
+		myTree = p;
+		RESULT = p;
+	:}
+	| simple_expression:simp_exp AsignacionIgual:asignacion_igual simple_expression:simp_exp2 {: ExpressionNode p = new ExpressionNode("Expression", (ExpressionNode)simp_exp, new Node("Asignacion Igual"), (ExpressionNode)simp_exp2); 
+		myTree = p;
+		RESULT = p;
+	:}
     ;
 
-factor ::= Numero {: System.out.println("Produccion #49"); :}
-	| Not factor {: System.out.println("Produccion #50"); :}
-	| constant {: System.out.println("Produccion #51"); :}
-	| Variable ParentesisAbierto expression_list ParentesisCerrado {: System.out.println("Produccion #52"); :}
-	| ParentesisAbierto expression_list ParentesisCerrado {: System.out.println("Produccion #52"); :}
+simple_expression ::= simple_expression:simp_exp OpSuma:opsuma mult_expression:mult_exp {: ExpressionNode p = new ExpressionNode("Expression", (ExpressionNode)simp_exp, new Node("Operador Suma"), (ExpressionNode)mult_exp); 
+		myTree = p;
+		RESULT = p;
+	:}
+	| mult_expression:mult_exp {: RESULT = mult_exp; :}
 	;
 
-constant ::= constant_character {: System.out.println("Produccion #53"); :}
-	| constant_string {: System.out.println("Produccion #54"); :}
+mult_expression ::= mult_expression:mult_exp OpMult:opmult factor:fac {: ExpressionNode p = new ExpressionNode("Expression", (ExpressionNode)mult_exp, new Node("Operador Multiplicacion"), new Node("Factor")); 
+		myTree = p;
+		RESULT = p;
+	:}
+	| factor:fac {: RESULT = fac; :}
 	;
 
-constant_character ::= Constchar {: System.out.println("Produccion #55"); :}
+factor ::= Numero:numero {: Node n = new Node("Numero");
+        n.setValue("Integer");
+        ExpressionNode p = new ExpressionNode("Expression" , n);
+        RESULT = p;
+	:}
+	| Variable:var {: Node n = new Node("Variable");
+		n.setValue("Variable");
+		ExpressionNode p = new ExpressionNode("Expression", n);
+		RESULT = p;
+	:}
+	| Not:not factor:fac {: Node n = new Node("Not");
+        n.setValue("Not");
+        ExpressionNode p = new ExpressionNode("Expression" , n, new Node("Factor"));
+        RESULT = p; 
+	:}
+	| constant:cons {: RESULT = cons; :}
+	| ParentesisAbierto expression_list:exp_list ParentesisCerrado {: ExpressionNode p = new ExpressionNode("Expression", (ExpressionNode)exp_list); 
+		myTree = p;
+		RESULT = p; 
+	:}
 	;
 
-constant_string ::= Conststr {: System.out.println("Produccion #56"); :}
+constant ::= constant_character {:  :}
+	| constant_string {:  :}
+	;
+
+constant_character ::= Constchar {:  :}
+	;
+
+constant_string ::= Conststr {:  :}
 	;
 
 final_instruccion_error ::= FinalInstruccion {:  :}
     | error {: parser.report_error("Falta final de instruccion", null); :}
     ;
+
+records ::= Var Variable AsignacionIgual Record lista_record_values End  {:  :}
+	;
+
+lista_record_values ::= Variable AsignacionTipo Tipo FinalInstruccion lista_record_values {:  :}
+	| {: :}
+	;

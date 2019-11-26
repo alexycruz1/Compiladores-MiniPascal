@@ -15,13 +15,6 @@ class ExpressionNode extends Node {
         this.addSon(der);
     }
 
-    public ExpressionNode(String label, Node izq, ExpressionNode op, ExpressionNode der) {
-        super(label);
-        this.addSon(izq);
-        this.addSon(op);
-        this.addSon(der);
-    }
-
     public ExpressionNode(String label, ExpressionNode izq, ExpressionNode op, ExpressionNode der) {
         super(label);
         this.addSon(izq);
@@ -37,6 +30,12 @@ class ExpressionNode extends Node {
     }
 
     public ExpressionNode(String label, Node izq, ExpressionNode op) {
+        super(label);
+        this.addSon(izq);
+        this.addSon(op);
+    }
+
+    public ExpressionNode(String label, Node izq, Node op) {
         super(label);
         this.addSon(izq);
         this.addSon(op);
