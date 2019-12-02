@@ -141,12 +141,12 @@ optional_statements ::= statement_list {:  :}
 statement_list ::= statement:state FinalInstruccion {: RESULT = state; :}
 	| error FinalInstruccion {: parser.report_error("Error en el statement", null); :}
 	| statement_list:state_list statement:state FinalInstruccion {: 
-		ArrayList n = new ArrayList();
+		/*ArrayList n = new ArrayList();
 		
 		n.add(state);
 		n.addAll((ArrayList)state_list);
 
-		RESULT = n;
+		RESULT = n;*/
 	:}
 	| statement_list error FinalInstruccion {: parser.report_error("Error en el statement", null); :}
 	;

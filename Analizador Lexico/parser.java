@@ -814,12 +814,12 @@ class CUP$parser$actions {
 		int stateright = ((java_cup.runtime.Symbol)CUP$parser$stack.elementAt(CUP$parser$top-1)).right;
 		Object state = (Object)((java_cup.runtime.Symbol) CUP$parser$stack.elementAt(CUP$parser$top-1)).value;
 		 
-		ArrayList n = new ArrayList();
+		/*ArrayList n = new ArrayList();
 		
 		n.add(state);
 		n.addAll((ArrayList)state_list);
 
-		RESULT = n;
+		RESULT = n;*/
 	
               CUP$parser$result = parser.getSymbolFactory().newSymbol("statement_list",12, ((java_cup.runtime.Symbol)CUP$parser$stack.elementAt(CUP$parser$top-2)), ((java_cup.runtime.Symbol)CUP$parser$stack.peek()), RESULT);
             }
