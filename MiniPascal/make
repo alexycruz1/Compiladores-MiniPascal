@@ -1,0 +1,44 @@
+  clear
+
+   cd src/Analyzer
+
+  if [ ! -f ./Lexical.jflex ]; then
+
+    echo The source file Lexical.jflex does not exist.
+    exit
+
+  fi
+
+  echo Compiling... 
+  echo
+
+  if [ -f ./Lexical.java ]; then
+  
+    set -e
+    echo Remove Lexical.java
+    echo
+    rm Lexical.java
+
+  fi
+
+  if [ -f ./Lexical.java~ ]; then
+
+    echo Remove Lexical.java~
+    echo
+    rm Lexical.java~
+  fi
+
+  echo Compile Lexical.jflex
+  echo
+  jflex Lexical.jflex
+  echo
+
+  echo Compile Syntactical.cup
+  echo
+  cup -parser Syntactical -symbols CompilerSymbol Syntactical.cup
+  echo
+
+
+  echo All Compiled!
+
+
