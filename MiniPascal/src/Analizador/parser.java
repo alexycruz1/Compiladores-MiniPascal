@@ -4,16 +4,11 @@
 //----------------------------------------------------
 
 package Analizador;
+
 import java_cup.runtime.*;
 import java.util.ArrayList;
+import Arbol.*;
 import java_cup.runtime.XMLElement;
-import Arbol.Node;
-import Arbol.ExpressionNode;
-import Arbol.ElseNode;
-import Arbol.ForNode;
-import Arbol.IfNode;
-import Arbol.RepeatNode;
-import Arbol.WhileNode;
 
 /** CUP v0.11b 20160615 (GIT 4ac7450) generated parser.
   */
@@ -802,7 +797,13 @@ class CUP$parser$actions {
 		int stateleft = ((java_cup.runtime.Symbol)CUP$parser$stack.elementAt(CUP$parser$top-1)).left;
 		int stateright = ((java_cup.runtime.Symbol)CUP$parser$stack.elementAt(CUP$parser$top-1)).right;
 		Object state = (Object)((java_cup.runtime.Symbol) CUP$parser$stack.elementAt(CUP$parser$top-1)).value;
-		 RESULT = state; 
+		
+			ArrayList n = new ArrayList();
+			
+			n.add(state);
+			
+			RESULT = n;
+		
               CUP$parser$result = parser.getSymbolFactory().newSymbol("statement_list",12, ((java_cup.runtime.Symbol)CUP$parser$stack.elementAt(CUP$parser$top-1)), ((java_cup.runtime.Symbol)CUP$parser$stack.peek()), RESULT);
             }
           return CUP$parser$result;
@@ -811,7 +812,9 @@ class CUP$parser$actions {
           case 33: // statement_list ::= error FinalInstruccion 
             {
               Object RESULT =null;
-		 parser.report_error("Error en el statement", null); 
+		
+			parser.report_error("Error en el statement", null);
+		
               CUP$parser$result = parser.getSymbolFactory().newSymbol("statement_list",12, ((java_cup.runtime.Symbol)CUP$parser$stack.elementAt(CUP$parser$top-1)), ((java_cup.runtime.Symbol)CUP$parser$stack.peek()), RESULT);
             }
           return CUP$parser$result;
@@ -826,15 +829,14 @@ class CUP$parser$actions {
 		int stateleft = ((java_cup.runtime.Symbol)CUP$parser$stack.elementAt(CUP$parser$top-1)).left;
 		int stateright = ((java_cup.runtime.Symbol)CUP$parser$stack.elementAt(CUP$parser$top-1)).right;
 		Object state = (Object)((java_cup.runtime.Symbol) CUP$parser$stack.elementAt(CUP$parser$top-1)).value;
-		 
-		//System.out.println("LIST: " + state_list);
-		/*ArrayList n = new ArrayList();
 		
-		n.add(state);
-		n.addAll((ArrayList)state_list);
+			ArrayList n = new ArrayList();
+			
+			n.add(state);
+			n.addAll((ArrayList)state_list);
 
-		RESULT = n;*/
-	
+			RESULT = n;
+		
               CUP$parser$result = parser.getSymbolFactory().newSymbol("statement_list",12, ((java_cup.runtime.Symbol)CUP$parser$stack.elementAt(CUP$parser$top-2)), ((java_cup.runtime.Symbol)CUP$parser$stack.peek()), RESULT);
             }
           return CUP$parser$result;
@@ -843,7 +845,9 @@ class CUP$parser$actions {
           case 35: // statement_list ::= statement_list error FinalInstruccion 
             {
               Object RESULT =null;
-		 parser.report_error("Error en el statement", null); 
+		
+			parser.report_error("Error en el statement", null);
+		
               CUP$parser$result = parser.getSymbolFactory().newSymbol("statement_list",12, ((java_cup.runtime.Symbol)CUP$parser$stack.elementAt(CUP$parser$top-2)), ((java_cup.runtime.Symbol)CUP$parser$stack.peek()), RESULT);
             }
           return CUP$parser$result;

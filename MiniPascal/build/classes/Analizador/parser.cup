@@ -1,6 +1,7 @@
 package Analizador;
 import java_cup.runtime.*;
 import java.util.ArrayList;
+import Arbol.*;
 
 parser code {: 
 				public Node myTree = new Node("INIT");
@@ -141,19 +142,38 @@ optional_statements ::= statement_list:state_list {:
 	| {:  :} 
 	;
 
-statement_list ::= statement:state FinalInstruccion {: RESULT = state; :}
-	| error FinalInstruccion {: parser.report_error("Error en el statement", null); :}
-	| statement_list:state_list statement:state FinalInstruccion {: 
-		//System.out.println("LIST: " + state_list);
-		ArrayList n = new ArrayList();
-		
-		n.add(state);
-		n.addAll((ArrayList)state_list);
+// statement_list //
+statement_list ::=
+	statement: state FinalInstruccion 
+		{:
+			ArrayList n = new ArrayList();
+			
+			n.add(state);
+			
+			RESULT = n;
+		:}
+		|
+	error FinalInstruccion
+		{:
+			parser.report_error("Error en el statement", null);
+		:}
+		|
+	statement_list: state_list statement: state FinalInstruccion
+		{:
+			ArrayList n = new ArrayList();
+			
+			n.add(state);
+			n.addAll((ArrayList)state_list);
 
-		RESULT = n;
-	:}
-	| statement_list error FinalInstruccion {: parser.report_error("Error en el statement", null); :}
+			RESULT = n;
+		:}
+		|
+	statement_list error FinalInstruccion 
+		{:
+			parser.report_error("Error en el statement", null);
+		:}
 	;
+// \ statement_list //
 
 statement ::= variable:var AsignacionVariable expression:exp {: ExpressionNode p = new ExpressionNode("Expression", (ExpressionNode)var, (ExpressionNode)exp); 
 		myTree = p;
