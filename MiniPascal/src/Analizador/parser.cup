@@ -2,6 +2,8 @@ package Analizador;
 import java_cup.runtime.*;
 import java.util.ArrayList;
 import Arbol.*;
+import Table.*;
+import Types.*;
 
 parser code {: 
 
@@ -71,7 +73,7 @@ parser code {:
 terminal Begin, End, For, Function, If, To, Do, Else, Then, Until, While, Write, Read, 
 		Tipo, Not, Or, And, OpRel, OpSuma, OpMult, AsignacionVariable, AsignacionTipo, 
 		AsignacionIgual, FinalInstruccion, ParentesisAbierto, ParentesisCerrado, Coma, Punto, 
-		Variable, Constchar, Conststr, Program, Repeat, Procedure, Numero, StringPattern, Var,
+		Variable, Constchar, Conststr, Program, Repeat, Procedure, Numero, Var,
 		Record;
 
 non terminal program, identifier_list, declarations, subprogram_declaration, compound_statement, type,
@@ -645,9 +647,10 @@ constant_character ::=
 
 // constant_string //
 constant_string ::=
-	Conststr
+	Conststr: c
 		{:
-
+			Token token = new Token(c.toString(), cright + 1, cleft + 1);
+			RESULT = token;
 		:}
 	;
 // \ constant_string //

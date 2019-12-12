@@ -17,13 +17,12 @@ public class sym {
   public static final int Conststr = 32;
   public static final int Repeat = 34;
   public static final int If = 6;
-  public static final int Var = 38;
-  public static final int Record = 39;
+  public static final int Var = 37;
+  public static final int Record = 38;
   public static final int ParentesisAbierto = 26;
   public static final int Else = 9;
   public static final int Variable = 30;
   public static final int Read = 14;
-  public static final int StringPattern = 37;
   public static final int AsignacionIgual = 24;
   public static final int Then = 10;
   public static final int FinalInstruccion = 25;
@@ -86,7 +85,6 @@ public class sym {
   "Repeat",
   "Procedure",
   "Numero",
-  "StringPattern",
   "Var",
   "Record"
   };

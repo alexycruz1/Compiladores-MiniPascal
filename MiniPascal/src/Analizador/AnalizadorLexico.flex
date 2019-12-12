@@ -14,7 +14,6 @@ import java_cup.runtime.*;
 //DEFINICIONES UTILES
 Digito=[0-9]
 Numero={Digito}({Digito})*
-NegativeInteger="-"+{Numero}
 Caracter=[a-z]|[A-Z]
 
 //PALABRAS RESERVADAS
