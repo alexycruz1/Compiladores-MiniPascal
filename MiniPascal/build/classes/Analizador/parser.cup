@@ -7,9 +7,13 @@ import Types.*;
 
 parser code {: 
 
+	public int offset = 0;
+
 	public String Intermediate_code = "";
 
 	public Node myTree = new Node("INIT");
+
+	public SymbolTable sym_table = new SymbolTable();
 
 	public Node getMyTree(){
 		return myTree;
@@ -89,11 +93,15 @@ program ::=
 		{:
 
 			System.out.println("COMPILADO CON EXITO");
+			System.out.println(sym_table);
+
 		:}
 		|
 	Program final_instruccion_error declarations subprogram_declarations compound_statement Punto
 		{:
 			System.out.println("COMPILADO CON EXITO");
+			System.out.println(sym_table);
+
 		:}
 	;
 // \ program //
@@ -170,18 +178,26 @@ integer_declaration ::=
 
 // boolean_declaration //
 boolean_declaration ::=
-	declarations Var identifier_list AsignacionTipo type AsignacionIgual Variable FinalInstruccion
+	declarations Var identifier_list AsignacionTipo type: t AsignacionIgual Variable FinalInstruccion
 		{:
-
+			ArrayList ids = ((ArrayList)identifier_list);
+			for(int i = 0; i < ids.size(), i++) {
+				Token token = ids.get(i);
+				BooleanType type = new BooleanType(tright + 1, tleft + 1);
+				Scope scope = new Scope(new ArrayList());
+				SymbolRow sr = new SymbolRow(token, type, scope, offset);
+				sym_table.addSymbol(sr);
+			}
+			
 		:}
 	;
 // \ boolean_declaration //
 
 // type //
 type ::=
-	standard_type
+	standard_type: t
 		{:
-
+			RESULT = t;
 		:}
 		|
 		{:
@@ -192,9 +208,9 @@ type ::=
 
 // standard_type //
 standard_type ::=
-	Tipo
+	Tipo: t
 		{:
-
+			RESULT = t;
 		:}
 	;
 // \ standard_type //
@@ -593,7 +609,7 @@ factor ::=
 		:}
 		|
 	Variable: var
-		{:
+		{:	
 			Node n = new Node("Variable");
 			n.setValue("Variable");
 			ExpressionNode p = new ExpressionNode("Expression", n);
@@ -624,23 +640,23 @@ factor ::=
 
 // constant //
 constant ::=
-	constant_character
+	constant_character: cc
 		{:
-
+			RESULT = cc;
 		:}
 		|
-	constant_string 
+	constant_string: cs
 		{:
-
+			RESULT = cs;
 		:}
 	;
 // \ constant //
 
 // constant_character //
 constant_character ::=
-	Constchar
+	Constchar: c
 		{:
-
+			RESULT = c;
 		:}
 	;
 // \ constant_character //
@@ -649,8 +665,7 @@ constant_character ::=
 constant_string ::=
 	Conststr: c
 		{:
-			Token token = new Token(c.toString(), cright + 1, cleft + 1);
-			RESULT = token;
+			RESULT = c;
 		:}
 	;
 // \ constant_string //
