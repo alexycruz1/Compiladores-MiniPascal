@@ -4,65 +4,68 @@ import java.util.ArrayList;
 import Arbol.*;
 
 parser code {: 
-				public Node myTree = new Node("INIT");
 
-                public Node getMyTree(){
-                    return myTree;
-                }
+	public String Intermediate_code = "";
 
-				public void report_error(String message, Object info) {
-                    if (info instanceof Symbol) {
-                        if (((Symbol)info).left != -1 && ((Symbol)info).right != -1) {
-                            int line = (((Symbol)info).left)+1;
-                            int column = (((Symbol)info).right)+1;
-                            System.out.println(message + " " + " (line "+line+", column "+column+")");
-                        }
-                    }
-                    System.err.println(message);
-                }
-                public void syntax_error(Symbol s){
-                    String val = s.value != null ? s.value.toString() : getTokenName(s.sym);
-                    //errors.add("Error sintactico en la linea: " + s.left +" columna: "+ s.right + " simbolo: " + val);
-                    System.err.println("Error sintactico en la linea: " + s.left +" columna: "+ s.right + " simbolo: " + val);
-                }
+	public Node myTree = new Node("INIT");
 
-                public void unrecovered_syntax_error(Symbol s) {
-                    if (s.left < 1 || s.left < 1) return;
-                    String val = s.value != null ? s.value.toString() : getTokenName(s.sym);
-                    //errors.add("Error sintactico en la linea: " + s.left +" columna: "+ s.right + " simbolo: " + val);
-                    System.err.println("Error sintactico en la linea: " + s.left +" columna: "+ s.right + " simbolo: " + val);
+	public Node getMyTree(){
+		return myTree;
+	}
 
-                }
+	public void report_error(String message, Object info) {
+		if (info instanceof Symbol) {
+			if (((Symbol)info).left != -1 && ((Symbol)info).right != -1) {
+				int line = (((Symbol)info).left)+1;
+				int column = (((Symbol)info).right)+1;
+				System.out.println(message + " " + " (line "+line+", column "+column+")");
+			}
+		}
+		System.err.println(message);
+	}
+	public void syntax_error(Symbol s){
+		String val = s.value != null ? s.value.toString() : getTokenName(s.sym);
+		//errors.add("Error sintactico en la linea: " + s.left +" columna: "+ s.right + " simbolo: " + val);
+		System.err.println("Error sintactico en la linea: " + s.left +" columna: "+ s.right + " simbolo: " + val);
+	}
 
-                public String getTokenName(int id){
-                    String value = sym.terminalNames[id];
-                    switch(id) {
-                        case sym.ParentesisAbierto:
-                            return "(";
-                        case sym.ParentesisCerrado:
-                            return ")";
-                        case sym.Coma:
-                            return ",";
-                        case sym.AsignacionTipo:
-                            return ":";
-                        case sym.AsignacionVariable:
-                            return ":=";
-                        case sym.FinalInstruccion:
-                            return ";";
-                        case sym.For:
-                            return "for";
-						case sym.While:
-                            return "while";
-						case sym.Repeat:
-                            return "repeat";
-						case sym.If:
-                            return "if";
-						case sym.AsignacionIgual:
-                            return "=";	
-                        default:
-                            return value;  
-                    }
-                }
+	public void unrecovered_syntax_error(Symbol s) {
+		if (s.left < 1 || s.left < 1) return;
+		String val = s.value != null ? s.value.toString() : getTokenName(s.sym);
+		//errors.add("Error sintactico en la linea: " + s.left +" columna: "+ s.right + " simbolo: " + val);
+		System.err.println("Error sintactico en la linea: " + s.left +" columna: "+ s.right + " simbolo: " + val);
+
+	}
+
+	public String getTokenName(int id){
+		String value = sym.terminalNames[id];
+		switch(id) {
+			case sym.ParentesisAbierto:
+				return "(";
+			case sym.ParentesisCerrado:
+				return ")";
+			case sym.Coma:
+				return ",";
+			case sym.AsignacionTipo:
+				return ":";
+			case sym.AsignacionVariable:
+				return ":=";
+			case sym.FinalInstruccion:
+				return ";";
+			case sym.For:
+				return "for";
+			case sym.While:
+				return "while";
+			case sym.Repeat:
+				return "repeat";
+			case sym.If:
+				return "if";
+			case sym.AsignacionIgual:
+				return "=";	
+			default:
+				return value;  
+		}
+	}
 :};
 
 terminal Begin, End, For, Function, If, To, Do, Else, Then, Until, While, Write, Read, 
@@ -78,78 +81,225 @@ non terminal program, identifier_list, declarations, subprogram_declaration, com
 		relation, extra_expression, final_instruccion_error, records, lista_record_values, char_declaration, 
 		integer_declaration, boolean_declaration;
 		
+// program //
+program ::=
+	Program Variable final_instruccion_error declarations subprogram_declarations compound_statement Punto
+		{:
 
-program ::= Program Variable final_instruccion_error declarations subprogram_declarations compound_statement Punto {: System.out.println("COMPILADO CON EXITO"); :}
-	| Program final_instruccion_error declarations subprogram_declarations compound_statement Punto {: System.out.println("COMPILADO CON EXITO"); :}
+			System.out.println("COMPILADO CON EXITO");
+		:}
+		|
+	Program final_instruccion_error declarations subprogram_declarations compound_statement Punto
+		{:
+			System.out.println("COMPILADO CON EXITO");
+		:}
 	;
+// \ program //
 
-identifier_list ::= Variable {:  :}
-	| identifier_list Coma Variable {:  :}
-	;
+// identifier_list //
+identifier_list ::=
+	Variable
+		{:
 
-declarations ::= declarations Var identifier_list AsignacionTipo type FinalInstruccion {:  :}
-	| char_declaration {: :}
-	| integer_declaration {: :}
-	| boolean_declaration {: :}
-	| declarations Var identifier_list error type FinalInstruccion {: parser.report_error("Error en la asignacion de tipo", null); :}
-	| declarations records {: :}
-	| {:  :}
+		:}
+		|
+	identifier_list Coma Variable
+		{:
+
+		:}
+;
+// \ identifier_list //
+
+// declarations //
+declarations ::=
+	declarations Var identifier_list AsignacionTipo type FinalInstruccion
+		{:
+
+		:}
+		|
+	char_declaration 
+		{:
+			 
+		:}
+		|
+	integer_declaration 
+		{:
+			 
+		:}
+		|
+	boolean_declaration 
+		{:
+			 
+		:}
+		|
+	declarations Var identifier_list error type FinalInstruccion 
+		{:
+			 parser.report_error("Error en la asignacion de tipo", null); 
+		:}
+		|
+	declarations records 
+		{:
+			 
+		:}
+		|
+		{:
+			// Empty
+		:}
 	; 
+// \ declarations //
 
-char_declaration ::= declarations Var identifier_list AsignacionTipo type AsignacionIgual constant_character FinalInstruccion {: :}
+// char_declaration //
+char_declaration ::=
+	declarations Var identifier_list AsignacionTipo type AsignacionIgual constant_character FinalInstruccion
+		{:
+		
+		:}
 	;
+// \ char_declaration //
 
-integer_declaration ::= declarations Var identifier_list AsignacionTipo type AsignacionIgual Numero FinalInstruccion {: :}
+// integer_declaration //
+integer_declaration ::=
+	declarations Var identifier_list AsignacionTipo type AsignacionIgual Numero FinalInstruccion
+		{:
+
+		:}
 	;
+// \ integer_declaration //
 
-boolean_declaration ::= declarations Var identifier_list AsignacionTipo type AsignacionIgual Variable FinalInstruccion {: :}
+// boolean_declaration //
+boolean_declaration ::=
+	declarations Var identifier_list AsignacionTipo type AsignacionIgual Variable FinalInstruccion
+		{:
+
+		:}
 	;
+// \ boolean_declaration //
 
-type ::= standard_type {:  :}
-	| {:  :}
+// type //
+type ::=
+	standard_type
+		{:
+
+		:}
+		|
+		{:
+			// Empty
+		:}
 	;
+// \ type //
 
-standard_type ::= Tipo {:  :}
+// standard_type //
+standard_type ::=
+	Tipo
+		{:
+
+		:}
 	;
+// \ standard_type //
 
-subprogram_declarations ::= subprogram_declarations subprogram_declaration final_instruccion_error {:  :}
-	| subprogram_declarations final_instruccion_error {: :}
-	| {:  :}
+// subprogram_declarations //
+subprogram_declarations ::=
+	subprogram_declarations subprogram_declaration final_instruccion_error
+		{:
+
+		:}
+		|
+	subprogram_declarations final_instruccion_error
+		{:
+
+		:}
+		|
+		{:
+			// Empty
+		:}
 	; 
+// \ subprogram_declarations //
 
-subprogram_declaration ::= subprogram_head declarations compound_statement {:  :}
+// subprogram_declaration //
+subprogram_declaration ::=
+	subprogram_head declarations compound_statement
+		{:
+			
+		:}
 	;
+// \ subprogram_declaration //
 
-subprogram_head ::= Function Variable arguments AsignacionTipo standard_type final_instruccion_error {:  :}
-	| Function Variable arguments AsignacionTipo final_instruccion_error {: :}
-	| Procedure Variable arguments FinalInstruccion {:  :}
-	;
+// subprogram_head //
+subprogram_head ::=
+	Function Variable arguments AsignacionTipo standard_type final_instruccion_error
+		{:
 
-arguments ::= ParentesisAbierto parameter_list ParentesisCerrado {:  :}
-	|
-	;
+		:}
+		|
+	Function Variable arguments AsignacionTipo final_instruccion_error
+		{:
 
-parameter_list ::= identifier_list AsignacionTipo type {:  :}
-	| parameter_list FinalInstruccion identifier_list AsignacionTipo type {:  :}
-	;
+		:}
+		|
+	Procedure Variable arguments FinalInstruccion
+		{:
 
-compound_statement ::= Begin optional_statements End {:  :}
+		:}
 	;
+// \ subprogram_head //
 
-optional_statements ::= statement_list:state_list {:
-		//System.out.println("LIST2: " + state_list);
-	:}
-	| {:  :} 
+// arguments //
+arguments ::=
+	ParentesisAbierto parameter_list ParentesisCerrado
+		{: 
+			
+		:}
+		|
+		{: 
+			// Empty
+		:}
 	;
+// \ arguments //
+
+// parameter_list //
+parameter_list ::=
+	identifier_list AsignacionTipo type 
+		{:
+
+		:}
+		|
+	parameter_list FinalInstruccion identifier_list AsignacionTipo type 
+		{:
+
+		:}
+	;
+// \ parameter_list //
+
+// compound_statement //
+compound_statement ::=
+	Begin optional_statements End
+		{: 
+
+		:}
+	;
+// \ compound_statement //
+
+// optional_statements //
+optional_statements ::=
+	statement_list:state_list
+		{:
+			//System.out.println("LIST2: " + state_list);
+		:}
+		|
+		{:
+			// Empty
+		:} 
+	;
+// \ optional_statements //
 
 // statement_list //
 statement_list ::=
-	statement: state FinalInstruccion 
+	statement: state FinalInstruccion
 		{:
 			ArrayList n = new ArrayList();
 			
 			n.add(state);
-			
+
 			RESULT = n;
 		:}
 		|
@@ -158,8 +308,9 @@ statement_list ::=
 			parser.report_error("Error en el statement", null);
 		:}
 		|
-	statement_list: state_list statement: state FinalInstruccion
-		{:
+	statement_list: state_list statement:state FinalInstruccion
+		{: 
+			//System.out.println("LIST: " + state_list);
 			ArrayList n = new ArrayList();
 			
 			n.add(state);
@@ -168,143 +319,306 @@ statement_list ::=
 			RESULT = n;
 		:}
 		|
-	statement_list error FinalInstruccion 
+	statement_list error FinalInstruccion
 		{:
 			parser.report_error("Error en el statement", null);
 		:}
 	;
 // \ statement_list //
 
-statement ::= variable:var AsignacionVariable expression:exp {: ExpressionNode p = new ExpressionNode("Expression", (ExpressionNode)var, (ExpressionNode)exp); 
-		myTree = p;
-		RESULT = p;
-	:}
-	| procedure_statement {:  :}
-	| compound_statement {:  :}
-	| write_function {:  :}
-	| read_function {:  :}
-	| If expression Then statement:if_state Else statement:if_else_state {: 
-		IfNode ifNode = new IfNode("If");
-	 	
-		/*ifNode.createBodyNode((ArrayList)if_state);         
-        ifNode.createElseNode((ArrayList)if_else_state);*/
-        
-		myTree = ifNode;
-		RESULT = ifNode;
-	:}
-	| If error {: parser.report_error("Error en el If", null); :}
-	| While expression:exp Do statement:state {: 
-		WhileNode whileNode = new WhileNode(new ExpressionNode("Expression", (ExpressionNode)exp), (Node)state);
+// statement //
+statement ::=
+	variable: var AsignacionVariable expression: exp
+		{:
+			ExpressionNode p = new ExpressionNode("Expression", (ExpressionNode)var, (ExpressionNode)exp); 
+			myTree = p;
+			RESULT = p;
+		:}
+		|
+	procedure_statement
+		{:
 
-		myTree = whileNode;
-		RESULT = whileNode;
-	:}
-	| While error {: parser.report_error("Error en el While", null); :}
-	| For Variable AsignacionVariable factor To expression:exp Do statement:state {:  
-		ForNode forNode = new ForNode(new Node("Variable"), new Node("Factor"), new ExpressionNode("Expression", (ExpressionNode)exp), (Node)state);
+		:}
+		|
+	compound_statement
+		{:
 
-		myTree = forNode;
-		RESULT = forNode;
-	:}
-	| For error {: parser.report_error("Error en el For", null); :}
-	| Repeat statement:state Until Variable AsignacionIgual expression:exp {: 
-		RepeatNode repeatNode = new RepeatNode((Node)state, new Node("Variable"), new ExpressionNode("Expression", (ExpressionNode)exp));
-	
-		myTree = repeatNode;
-		RESULT = repeatNode;
-	 :}
-	| Repeat error {: parser.report_error("Error en el Repeat", null); :}
+		:}
+		|
+	write_function
+		{:
+
+		:}
+		|
+	read_function
+		{:
+
+		:}
+		|
+	If expression Then statement: if_state Else statement: if_else_state
+		{: 
+			IfNode ifNode = new IfNode("If");
+			
+			/*ifNode.createBodyNode((ArrayList)if_state);         
+			ifNode.createElseNode((ArrayList)if_else_state);*/
+			
+			myTree = ifNode;
+			RESULT = ifNode;
+		:}
+		|
+	If error
+		{:
+			parser.report_error("Error en el If", null);
+		:}
+		|
+	While expression: exp Do statement: state
+		{: 
+			WhileNode whileNode = new WhileNode(new ExpressionNode("Expression", (ExpressionNode)exp), (Node)state);
+
+			myTree = whileNode;
+			RESULT = whileNode;
+		:}
+		|
+	While error
+		{:
+			parser.report_error("Error en el While", null);
+		:}
+		|
+	For Variable AsignacionVariable factor To expression: exp Do statement: state
+		{:  
+			ForNode forNode = new ForNode(new Node("Variable"), new Node("Factor"), new ExpressionNode("Expression", (ExpressionNode)exp), (Node)state);
+
+			myTree = forNode;
+			RESULT = forNode;
+		:}
+		|
+	For error
+		{:
+			parser.report_error("Error en el For", null);
+		:}
+		|
+	Repeat statement: state Until Variable AsignacionIgual expression: exp
+		{: 
+			RepeatNode repeatNode = new RepeatNode((Node)state, new Node("Variable"), new ExpressionNode("Expression", (ExpressionNode)exp));
+		
+			myTree = repeatNode;
+			RESULT = repeatNode;
+		:}
+		|
+	Repeat error
+		{:
+			parser.report_error("Error en el Repeat", null);
+		:}
 	;
+// \ statement //
 
-write_function ::= Write ParentesisAbierto constant_string Coma Variable ParentesisCerrado {:  :}
-	| Write ParentesisAbierto constant_string ParentesisCerrado {: :}
+// write_function //
+write_function ::=
+	Write ParentesisAbierto constant_string Coma Variable ParentesisCerrado
+		{:
+
+		:}
+		|
+	Write ParentesisAbierto constant_string ParentesisCerrado
+		{:
+
+		:}
 	;
+// \ write_function //
 
-read_function ::= Read ParentesisAbierto Variable ParentesisCerrado {:  :}
+// read_function //
+read_function ::=
+	Read ParentesisAbierto Variable ParentesisCerrado
+		{:
+
+		:}
 	;
+// \ read_function //
 
-variable ::= Variable tail {:  :}
+// variable //
+variable ::=
+	Variable tail
+		{:
+
+		:}
 	;
+// \ variable //
 
-tail ::= expression tail {:  :}
-	| {:  :}
+// tail //
+tail ::=
+	expression tail
+		{:
+
+		:}
+		| 
+		{:
+			// Empty
+		:}
 	;
+// \ tail //
 
-procedure_statement ::= Variable {:  :}
-	| Variable ParentesisAbierto expression_list ParentesisCerrado {:  :}
+// procedure_statement //
+procedure_statement ::=
+	Variable
+		{:
+
+		:}
+		|
+	Variable ParentesisAbierto expression_list ParentesisCerrado
+		{:
+
+		:}
 	;
+// \ procedure_statement //
 
-expression_list ::= expression:exp extra_expression:ex_exp {: ExpressionNode p = new ExpressionNode("Expression", (ExpressionNode)exp, (ExpressionNode)ex_exp); 
-		myTree = p;
-		RESULT = p;
-	:}
+// expression_list //
+expression_list ::=
+	expression: exp extra_expression: ex_exp
+		{:
+			ExpressionNode p = new ExpressionNode("Expression", (ExpressionNode)exp, (ExpressionNode)ex_exp); 
+			myTree = p;
+			RESULT = p;
+		:}
 	;
+// \ expression_list //
 
-expression ::= expression:exp And:and relation:rel {: ExpressionNode p = new ExpressionNode("Expression", (ExpressionNode)exp, new Node("and"), (ExpressionNode)rel); 
-		myTree = p;
-		RESULT = p;
-	:}
-    | expression:exp Or:or relation:rel {: ExpressionNode p = new ExpressionNode("Expression", (ExpressionNode)exp, new Node("or"), (ExpressionNode)rel);
-		myTree = p;
-		RESULT = p; 
-	:}
-    | relation:rel {: RESULT = rel; :}
-	| error {: parser.report_error("Error en la expresion", null); :}
-    ;
-
-extra_expression ::= Coma expression:exp extra_expression:ex_exp {: ExpressionNode p = new ExpressionNode("Expression", (ExpressionNode)exp, (ExpressionNode)ex_exp); 
-		myTree = p;
-		RESULT = p;
-	:}
-	| {:  :}
+// expression //
+expression ::=
+	expression: exp And: and relation: rel
+		{:
+			ExpressionNode p = new ExpressionNode("Expression", (ExpressionNode)exp, new Node("and"), (ExpressionNode)rel); 
+			myTree = p;
+			RESULT = p;
+		:}
+		|
+	expression: exp Or: or relation: rel
+		{:
+			ExpressionNode p = new ExpressionNode("Expression", (ExpressionNode)exp, new Node("or"), (ExpressionNode)rel);
+			myTree = p;
+			RESULT = p; 
+		:}
+		|
+	relation: rel
+		{:
+			RESULT = rel;
+		:}
+		|
+	error
+		{:
+			parser.report_error("Error en la expresion", null);
+		:}
 	;
+// \ expression //
 
-relation ::= simple_expression:simp_exp {: RESULT = simp_exp; :}
-    | simple_expression:simp_exp OpRel:oprel simple_expression:simp_exp2 {: ExpressionNode p = new ExpressionNode("Expression", (ExpressionNode)simp_exp, new Node("Operador Relacional"), (ExpressionNode)simp_exp2); 
-		myTree = p;
-		RESULT = p;
-	:}
-	| simple_expression:simp_exp AsignacionIgual:asignacion_igual simple_expression:simp_exp2 {: ExpressionNode p = new ExpressionNode("Expression", (ExpressionNode)simp_exp, new Node("Asignacion Igual"), (ExpressionNode)simp_exp2); 
-		myTree = p;
-		RESULT = p;
-	:}
-    ;
-
-simple_expression ::= simple_expression:simp_exp OpSuma:opsuma mult_expression:mult_exp {: ExpressionNode p = new ExpressionNode("Expression", (ExpressionNode)simp_exp, new Node("Operador Suma"), (ExpressionNode)mult_exp); 
-		myTree = p;
-		RESULT = p;
-	:}
-	| mult_expression:mult_exp {: RESULT = mult_exp; :}
+// extra_expression //
+extra_expression ::=
+	Coma expression: exp extra_expression: ex_exp
+		{:
+			ExpressionNode p = new ExpressionNode("Expression", (ExpressionNode)exp, (ExpressionNode)ex_exp); 
+			myTree = p;
+			RESULT = p;
+		:}
+		|
+		{:
+			// Empty
+		:}
 	;
+// \ extra_expression //
 
-mult_expression ::= mult_expression:mult_exp OpMult:opmult factor:fac {: ExpressionNode p = new ExpressionNode("Expression", (ExpressionNode)mult_exp, new Node("Operador Multiplicacion"), new Node("Factor")); 
-		myTree = p;
-		RESULT = p;
-	:}
-	| factor:fac {: RESULT = fac; :}
+// relation //
+relation ::=
+	simple_expression: simp_exp
+		{:
+			RESULT = simp_exp;
+		:}
+		|
+	simple_expression: simp_exp OpRel: oprel simple_expression: simp_exp2
+		{:
+			ExpressionNode p = new ExpressionNode("Expression", (ExpressionNode)simp_exp, new Node("Operador Relacional"), (ExpressionNode)simp_exp2); 
+			myTree = p;
+			RESULT = p;
+		:}
+		|
+	simple_expression: simp_exp AsignacionIgual: asignacion_igual simple_expression: simp_exp2
+		{:
+			ExpressionNode p = new ExpressionNode("Expression", (ExpressionNode)simp_exp, new Node("Asignacion Igual"), (ExpressionNode)simp_exp2); 
+			myTree = p;
+			RESULT = p;
+		:}
 	;
+// \ relation //
 
-factor ::= Numero:numero {: Node n = new Node("Numero");
-        n.setValue("Integer");
-        ExpressionNode p = new ExpressionNode("Expression" , n);
-        RESULT = p;
-	:}
-	| Variable:var {: Node n = new Node("Variable");
-		n.setValue("Variable");
-		ExpressionNode p = new ExpressionNode("Expression", n);
-		RESULT = p;
-	:}
-	| Not:not factor:fac {: Node n = new Node("Not");
-        n.setValue("Not");
-        ExpressionNode p = new ExpressionNode("Expression" , n, new Node("Factor"));
-        RESULT = p; 
-	:}
-	| constant:cons {: RESULT = cons; :}
-	| ParentesisAbierto expression_list:exp_list ParentesisCerrado {: ExpressionNode p = new ExpressionNode("Expression", (ExpressionNode)exp_list); 
-		myTree = p;
-		RESULT = p; 
-	:}
+// simple_expression //
+simple_expression ::=
+	simple_expression: simp_exp OpSuma: opsuma mult_expression: mult_exp
+		{:
+			ExpressionNode p = new ExpressionNode("Expression", (ExpressionNode)simp_exp, new Node("Operador Suma"), (ExpressionNode)mult_exp); 
+			myTree = p;
+			RESULT = p;
+		:}
+		|
+	mult_expression: mult_exp
+		{:
+			RESULT = mult_exp;
+		:}
 	;
+// \ simple_expression //
+
+// mult_expression //
+mult_expression ::=
+	mult_expression: mult_exp OpMult: opmult factor: fac
+		{:
+			ExpressionNode p = new ExpressionNode("Expression", (ExpressionNode)mult_exp, new Node("Operador Multiplicacion"), new Node("Factor")); 
+			myTree = p;
+			RESULT = p;
+		:}
+		|
+	factor: fac
+		{:
+			RESULT = fac;
+		:}
+	;
+// \ mult_expression //
+
+// factor //
+factor ::=
+	Numero: numero
+		{:
+			Node n = new Node("Numero");
+			n.setValue("Integer");
+			ExpressionNode p = new ExpressionNode("Expression" , n);
+			RESULT = p;
+		:}
+		|
+	Variable: var
+		{:
+			Node n = new Node("Variable");
+			n.setValue("Variable");
+			ExpressionNode p = new ExpressionNode("Expression", n);
+			RESULT = p;
+		:}
+		|
+	Not: not factor: fac
+		{:
+			Node n = new Node("Not");
+			n.setValue("Not");
+			ExpressionNode p = new ExpressionNode("Expression" , n, new Node("Factor"));
+			RESULT = p; 
+		:}
+		|
+	constant: cons
+		{:
+			RESULT = cons;
+		:}
+		|
+	ParentesisAbierto expression_list: exp_list ParentesisCerrado
+		{:
+			ExpressionNode p = new ExpressionNode("Expression", (ExpressionNode)exp_list); 
+			myTree = p;
+			RESULT = p; 
+		:}
+	;
+// \ factor //
 
 constant ::= constant_character {:  :}
 	| constant_string {:  :}
