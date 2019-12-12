@@ -145,10 +145,10 @@ statement_list ::= statement:state FinalInstruccion {: RESULT = state; :}
 	| error FinalInstruccion {: parser.report_error("Error en el statement", null); :}
 	| statement_list:state_list statement:state FinalInstruccion {: 
 		//System.out.println("LIST: " + state_list);
-		ArrayList n = new ArrayList();
+		/*ArrayList n = new ArrayList();
 		
 		n.add(state);
-		n.addAll((ArrayList)state_list);
+		n.addAll((ArrayList)state_list);*/
 
 		RESULT = n;
 	:}
