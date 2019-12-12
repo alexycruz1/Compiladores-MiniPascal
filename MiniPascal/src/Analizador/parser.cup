@@ -624,23 +624,24 @@ factor ::=
 
 // constant //
 constant ::=
-	constant_character
+	constant_character: cc
 		{:
-
+			RESULT = cc;
 		:}
 		|
-	constant_string 
+	constant_string: cs
 		{:
-
+			RESULT = cs;
 		:}
 	;
 // \ constant //
 
 // constant_character //
 constant_character ::=
-	Constchar
+	Constchar: c
 		{:
-
+			Token token = new Token(c.toString(), cright + 1, cleft + 1);
+			RESULT = token;
 		:}
 	;
 // \ constant_character //
