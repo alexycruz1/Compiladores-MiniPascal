@@ -410,22 +410,22 @@ public class parser extends java_cup.runtime.lr_parser {
 			if (((Symbol)info).left != -1 && ((Symbol)info).right != -1) {
 				int line = (((Symbol)info).left)+1;
 				int column = (((Symbol)info).right)+1;
-				System.out.println(message + " " + " (line "+line+", column "+column+")");
+				errors.add(message + " " + " (line "+line+", column "+column+")");
 			}
 		}
-		System.out.println(message);
+		errors.add(message);
 	}
 	public void syntax_error(Symbol s){
 		String val = s.value != null ? s.value.toString() : getTokenName(s.sym);
 		//errors.add("Error sintactico en la linea: " + s.left +" columna: "+ s.right + " simbolo: " + val);
-		System.out.println("Error sintactico en la linea: " + s.left +" columna: "+ s.right + " simbolo: " + val);
+		errors.add("Error sintactico en la linea: " + s.left +" columna: "+ s.right + " simbolo: " + val);
 	}
 
 	public void unrecovered_syntax_error(Symbol s) {
 		if (s.left < 1 ||s.left < 1) return;
 		String val = s.value != null ? s.value.toString() : getTokenName(s.sym);
 		//errors.add("Error sintactico en la linea: " + s.left +" columna: "+ s.right + " simbolo: " + val);
-		System.out.println("Error sintactico en la linea: " + s.left +" columna: "+ s.right + " simbolo: " + val);
+		errors.add("Error sintactico en la linea: " + s.left +" columna: "+ s.right + " simbolo: " + val);
 
 	}
 
@@ -1891,6 +1891,22 @@ class CUP$parser$actions {
 			JSONObject myJson = new JSONObject();
 			myJson.put("expression", (JSONObject) exp);
 			myJson.put("extra_expression", (JSONObject) ex_exp);
+
+			// VALIDAR TIPO PARAMETROS
+
+			String type1 = ((JSONObject) exp).get("validate_type").toString();
+			String type2 = ((JSONObject) ex_exp).get("validate_type").toString();
+
+			String real_type = "";
+
+			if(type2.equals("NULL")) {
+				real_type = type1;
+			} else {
+				real_type = type1 + "X"	+ type2;
+			}
+
+			myJson.put("validate_type", real_type);
+
 			RESULT = myJson;
 		
               CUP$parser$result = parser.getSymbolFactory().newSymbol("expression_list",16, ((java_cup.runtime.Symbol)CUP$parser$stack.elementAt(CUP$parser$top-1)), ((java_cup.runtime.Symbol)CUP$parser$stack.peek()), RESULT);
@@ -1915,6 +1931,26 @@ class CUP$parser$actions {
 			myJson.put("expression", (JSONObject) exp);
 			myJson.put("And", and.toString());
 			myJson.put("relation", (JSONObject) rel);
+			
+			// VALIDAR TIPO COMPARACION
+
+			String type1 = ((JSONObject) exp).get("validate_type").toString();
+			String type2 = ((JSONObject) rel).get("validate_type").toString();
+
+			if(type1.equals("ERROR") && type2.equals("ERROR")) {
+				myJson.put("validate_type", "ERROR");
+			}
+			
+			else if(type1.equals(type2) && type1.equals("BOOLEAN")) {
+				myJson.put("validate_type", "BOOLEAN");
+			}
+
+			else {
+				errors.add("Error: No se puede operar " + type1 + " " + and.toString() + " " + type2 + " (" + (expleft + 1) + ", " + (expright +1) +")." );
+				myJson.put("validate_type", "ERROR");
+			}
+			// _________________________________________
+
 			RESULT = myJson;
 		
               CUP$parser$result = parser.getSymbolFactory().newSymbol("expression",14, ((java_cup.runtime.Symbol)CUP$parser$stack.elementAt(CUP$parser$top-2)), ((java_cup.runtime.Symbol)CUP$parser$stack.peek()), RESULT);
@@ -1939,6 +1975,26 @@ class CUP$parser$actions {
 			myJson.put("expression", (JSONObject) exp);
 			myJson.put("Or", or.toString());
 			myJson.put("relation", (JSONObject) rel);
+			
+			// VALIDAR TIPO COMPARACION
+
+			String type1 = ((JSONObject) exp).get("validate_type").toString();
+			String type2 = ((JSONObject) rel).get("validate_type").toString();
+
+			if(type1.equals("ERROR") && type2.equals("ERROR")) {
+				myJson.put("validate_type", "ERROR");
+			}
+			
+			else if(type1.equals(type2) && type1.equals("BOOLEAN")) {
+				myJson.put("validate_type", "BOOLEAN");
+			}
+
+			else {
+				errors.add("Error: No se puede operar " + type1 + " " + or.toString() + " " + type2 + " (" + (expleft + 1) + ", " + (expright +1) +")." );
+				myJson.put("validate_type", "ERROR");
+			}
+			// _________________________________________
+
 			RESULT = myJson;
 		
               CUP$parser$result = parser.getSymbolFactory().newSymbol("expression",14, ((java_cup.runtime.Symbol)CUP$parser$stack.elementAt(CUP$parser$top-2)), ((java_cup.runtime.Symbol)CUP$parser$stack.peek()), RESULT);
@@ -1955,6 +2011,7 @@ class CUP$parser$actions {
 		
 			JSONObject myJson = new JSONObject();
 			myJson.put("relation", (JSONObject) rel);
+			myJson.put("validate_type", ((JSONObject) rel).get("validate_type").toString());
 			RESULT = myJson;
 		
               CUP$parser$result = parser.getSymbolFactory().newSymbol("expression",14, ((java_cup.runtime.Symbol)CUP$parser$stack.peek()), ((java_cup.runtime.Symbol)CUP$parser$stack.peek()), RESULT);
@@ -1967,6 +2024,9 @@ class CUP$parser$actions {
               Object RESULT =null;
 		
 			parser.report_error("Error en la expresion", null);
+			JSONObject myJson = new JSONObject();
+			myJson.put("validate_type", "ERROR");
+			RESULT = myJson;
 		
               CUP$parser$result = parser.getSymbolFactory().newSymbol("expression",14, ((java_cup.runtime.Symbol)CUP$parser$stack.peek()), ((java_cup.runtime.Symbol)CUP$parser$stack.peek()), RESULT);
             }
@@ -1990,6 +2050,22 @@ class CUP$parser$actions {
 			myJson.put("Coma", coma.toString());
 			myJson.put("expression", (JSONObject) exp);
 			myJson.put("extra_expression", (JSONObject) ex_exp);
+
+			// VALIDAR TIPO PARAMETROS
+
+			String type1 = ((JSONObject) exp).get("validate_type").toString();
+			String type2 = ((JSONObject) ex_exp).get("validate_type").toString();
+
+			String real_type = "";
+
+			if(type2.equals("NULL")) {
+				real_type = type1;
+			} else {
+				real_type = type1 + "X"	+ type2;
+			}
+
+			myJson.put("validate_type", real_type);
+
 			RESULT = myJson;
 		
               CUP$parser$result = parser.getSymbolFactory().newSymbol("extra_expression",26, ((java_cup.runtime.Symbol)CUP$parser$stack.elementAt(CUP$parser$top-2)), ((java_cup.runtime.Symbol)CUP$parser$stack.peek()), RESULT);
@@ -2002,6 +2078,9 @@ class CUP$parser$actions {
               Object RESULT =null;
 		
 			// Empty
+			JSONObject myJson = new JSONObject();
+			myJson.put("validate_type", "NULL");
+			RESULT = myJson;
 		
               CUP$parser$result = parser.getSymbolFactory().newSymbol("extra_expression",26, ((java_cup.runtime.Symbol)CUP$parser$stack.peek()), RESULT);
             }
@@ -2017,6 +2096,7 @@ class CUP$parser$actions {
 		
 			JSONObject myJson = new JSONObject();
 			myJson.put("simple_expression", (JSONObject) simp_exp);
+			myJson.put("validate_type", ((JSONObject) simp_exp).get("validate_type").toString());
 			RESULT = myJson;
 		
               CUP$parser$result = parser.getSymbolFactory().newSymbol("relation",25, ((java_cup.runtime.Symbol)CUP$parser$stack.peek()), ((java_cup.runtime.Symbol)CUP$parser$stack.peek()), RESULT);
@@ -2041,6 +2121,26 @@ class CUP$parser$actions {
 			myJson.put("simple_expression", (JSONObject) simp_exp);
 			myJson.put("OpRel", oprel.toString());
 			myJson.put("simple_expression", (JSONObject) simp_exp2);
+
+			// VALIDAR TIPO COMPARACION
+
+			String type1 = ((JSONObject) simp_exp).get("validate_type").toString();
+			String type2 = ((JSONObject) simp_exp2).get("validate_type").toString();
+
+			if(type1.equals("ERROR") && type2.equals("ERROR")) {
+				myJson.put("validate_type", "ERROR");
+			}
+			
+			else if(type1.equals(type2)) {
+				myJson.put("validate_type", "BOOLEAN");
+			}
+
+			else {
+				errors.add("Error: No se puede operar " + type1 + " " + oprel.toString() + " " + type2 + " (" + (simp_expleft + 1) + ", " + (simp_expright +1) +")." );
+				myJson.put("validate_type", "ERROR");
+			}
+			// _________________________________________
+
 			RESULT = myJson;
 		
               CUP$parser$result = parser.getSymbolFactory().newSymbol("relation",25, ((java_cup.runtime.Symbol)CUP$parser$stack.elementAt(CUP$parser$top-2)), ((java_cup.runtime.Symbol)CUP$parser$stack.peek()), RESULT);
@@ -2065,6 +2165,26 @@ class CUP$parser$actions {
 			myJson.put("simple_expression", (JSONObject) simp_exp);
 			myJson.put("AsignacionIgual", asignacion_igual.toString());
 			myJson.put("simple_expression", (JSONObject) simp_exp2);
+			
+			// VALIDAR TIPO COMPARACION
+
+			String type1 = ((JSONObject) simp_exp).get("validate_type").toString();
+			String type2 = ((JSONObject) simp_exp2).get("validate_type").toString();
+
+			if(type1.equals("ERROR") && type2.equals("ERROR")) {
+				myJson.put("validate_type", "ERROR");
+			}
+			
+			else if(type1.equals(type2)) {
+				myJson.put("validate_type", "BOOLEAN");
+			}
+
+			else {
+				errors.add("Error: No se puede operar " + type1 + " " + asignacion_igual.toString() + " " + type2 + " (" + (simp_expleft + 1) + ", " + (simp_expright +1) +")." );
+				myJson.put("validate_type", "ERROR");
+			}
+			// _________________________________________
+			
 			RESULT = myJson;
 		
               CUP$parser$result = parser.getSymbolFactory().newSymbol("relation",25, ((java_cup.runtime.Symbol)CUP$parser$stack.elementAt(CUP$parser$top-2)), ((java_cup.runtime.Symbol)CUP$parser$stack.peek()), RESULT);
@@ -2089,6 +2209,41 @@ class CUP$parser$actions {
 			myJson.put("simple_expression", (JSONObject) simp_exp);
 			myJson.put("OpSuma", opsuma.toString());
 			myJson.put("mult_expression", (JSONObject) mult_exp);
+
+			// VALIDAR TIPO SUMA
+			// SOLO VALIDO PARA INTEGER Y STRING
+
+			String type1 = ((JSONObject) simp_exp).get("validate_type").toString();
+			String type2 = ((JSONObject) mult_exp).get("validate_type").toString();
+
+			if(type1.equals("ERROR") && type2.equals("ERROR")) {
+				myJson.put("validate_type", "ERROR");
+			}
+			
+			else if(type1.equals(type2) && type1.equals("INTEGER")) {
+				myJson.put("validate_type", "INTEGER");
+			}
+
+			else if(type1.equals(type2) && type1.equals("STRING")) {
+				myJson.put("validate_type", "STRING");
+			}
+
+			else if(type1.equals("STRING") || type2.equals("STRING")) {
+				errors.add("Error: No se puede operar " + type1 + " " + opsuma.toString() + " " + type2 + ", optando por STRING (" + (simp_expleft + 1) + ", " + (simp_expright +1) +"). " );
+				myJson.put("validate_type", "STRING");
+			}
+
+			else if(type1.equals("INTEGER") || type2.equals("INTEGER")) {
+				errors.add("Error: No se puede operar " + type1 + " " + opsuma.toString() + " " + type2 + ", optando por INTEGER (" + (simp_expleft + 1) + ", " + (simp_expright +1) +"). " );
+				myJson.put("validate_type", "INTEGER");
+			}
+
+			else {
+				errors.add("Error: No se puede operar " + type1 + " " + opsuma.toString() + " " + type2 + " (" + (simp_expleft + 1) + ", " + (simp_expright +1) +")." );
+				myJson.put("validate_type", "ERROR");
+			}
+			// _________________________________________
+
 			RESULT = myJson;
 		
               CUP$parser$result = parser.getSymbolFactory().newSymbol("simple_expression",22, ((java_cup.runtime.Symbol)CUP$parser$stack.elementAt(CUP$parser$top-2)), ((java_cup.runtime.Symbol)CUP$parser$stack.peek()), RESULT);
@@ -2105,6 +2260,7 @@ class CUP$parser$actions {
 		
 			JSONObject myJson = new JSONObject();
 			myJson.put("mult_expression", (JSONObject) mult_exp);
+			myJson.put("validate_type", ((JSONObject) mult_exp).get("validate_type").toString());
 			RESULT = myJson;
 		
               CUP$parser$result = parser.getSymbolFactory().newSymbol("simple_expression",22, ((java_cup.runtime.Symbol)CUP$parser$stack.peek()), ((java_cup.runtime.Symbol)CUP$parser$stack.peek()), RESULT);
@@ -2129,6 +2285,33 @@ class CUP$parser$actions {
 			myJson.put("mult_expression", (JSONObject) mult_exp);
 			myJson.put("OpMult", opmult.toString());
 			myJson.put("factor", (JSONObject) fac);
+			
+			// VALIDAR TIPO MULTIPLICACION
+			// SOLO VALIDO PARA INTEGER
+
+			String type1 = ((JSONObject) mult_exp).get("validate_type").toString();
+			String type2 = ((JSONObject) fac).get("validate_type").toString();
+
+			if(type1.equals(type2) && type1.equals("INTEGER")) {
+				myJson.put("validate_type", "INTEGER");
+			}
+
+			else if(type1.equals("ERROR") && type2.equals("ERROR")) {
+				myJson.put("validate_type", "ERROR");
+			}
+
+			else if(type1.equals("INTEGER") || type2.equals("INTEGER")) {
+				errors.add("Error: No se puede operar " + type1 + " " + opmult.toString() + " " + type2 + ", optando por INTEGER (" + (mult_expleft + 1) + ", " + (mult_expright +1) +"). " );
+				myJson.put("validate_type", "INTEGER");
+			}
+
+			else {
+				errors.add("Error: No se puede operar " + type1 + " " + opmult.toString() + " " + type2 + " (" + (mult_expleft + 1) + ", " + (mult_expright +1) +")." );
+				myJson.put("validate_type", "ERROR");
+			}
+			
+			// _________________________________________
+						
 			RESULT = myJson;
 		
               CUP$parser$result = parser.getSymbolFactory().newSymbol("mult_expression",18, ((java_cup.runtime.Symbol)CUP$parser$stack.elementAt(CUP$parser$top-2)), ((java_cup.runtime.Symbol)CUP$parser$stack.peek()), RESULT);
@@ -2144,6 +2327,7 @@ class CUP$parser$actions {
 		Object fac = (Object)((java_cup.runtime.Symbol) CUP$parser$stack.peek()).value;
 		
 			JSONObject myJson = new JSONObject();
+			myJson.put("validate_type", ((JSONObject) fac).get("validate_type").toString());
 			myJson.put("factor", (JSONObject) fac);
 			RESULT = myJson;
 		
@@ -2162,14 +2346,9 @@ class CUP$parser$actions {
 			JSONObject myJson = new JSONObject();
 			current_type = "INTEGER";
 			myJson.put("type", "INTEGER");
+			myJson.put("validate_type", "INTEGER");
 			myJson.put("value", new Integer(numero.toString()));
 			
-			// Para el arbol
-			JSONArray facts = new JSONArray();
-			facts.add(new Integer(numero.toString()));
-			myJson.put("tree", facts);
-			//
-
 			RESULT = myJson;
 		
               CUP$parser$result = parser.getSymbolFactory().newSymbol("factor",17, ((java_cup.runtime.Symbol)CUP$parser$stack.peek()), ((java_cup.runtime.Symbol)CUP$parser$stack.peek()), RESULT);
@@ -2187,12 +2366,14 @@ class CUP$parser$actions {
 			JSONObject myJson = new JSONObject();
 			SymbolRow current_var = sym_table.find(v.toString(), current_scope);
 			if(current_var == null) {
-				errors.add("Error: No existe la variable " + v + " (" + (vleft + 1) + ", " + (vright +1) +")." );
+				errors.add("Error: No existe la variable " + v + " (" + (vleft + 1) + ", " + (vright + 1) + ")." );
+				myJson.put("validate_type", "ERROR");
 				myJson.put("type", "UNKNOWN");
 				myJson.put("error", new Boolean(true));
 			} else {
 				current_type = current_var.type.type;
-				myJson.put("type", "INTEGER");
+				myJson.put("type", "INTEGER"); 
+				myJson.put("validate_type", "INTEGER"); 
 				JSONArray path = new JSONArray();
 				for(Object value : current_var.scope.path) {
 					path.add(value.toString());		
@@ -2200,12 +2381,6 @@ class CUP$parser$actions {
 				myJson.put("scope", path );
 			}
 			myJson.put("id", v.toString());
-
-			// Para el arbol
-			JSONArray facts = new JSONArray();
-			facts.add(v.toString());
-			myJson.put("tree", facts);
-			//
 
 			RESULT = myJson;
 		
@@ -2229,15 +2404,10 @@ class CUP$parser$actions {
 			if(!current_type.equals("BOOLEAN")) {
 				errors.add("Error: Intenta negar una expresión de tipo no BOOLEAN (" + (facleft + 1) + ", " + (facright +1) +")." );
 				myJson.put("error", new Boolean(true));
+				myJson.put("validate_type", "ERROR");
 			}
 			myJson.put("type", current_type);
-
-			// Para el arbol
-			JSONArray facts = new JSONArray();
-			facts.add(not.toString());
-			facts.add((JSONArray) ((JSONObject) fac).get("tree"));
-			myJson.put("tree", facts);
-			//
+			myJson.put("validate_type", current_type);
 
 			RESULT = myJson;
 		
@@ -2255,15 +2425,10 @@ class CUP$parser$actions {
 		
 			JSONObject myJson = new JSONObject();
 
-			current_type = cons.toString().toUpperCase();
+			current_type = ((JSONObject) cons).get("validate_type").toString();
 
-			myJson.put("type", cons.toString().toUpperCase());
-
-			// Para el arbol
-			JSONArray facts = new JSONArray();
-			facts.add(cons.toString());
-			myJson.put("tree", facts);
-			//
+			myJson.put("type", ((JSONObject) cons).get("validate_type").toString());
+			myJson.put("validate_type", ((JSONObject) cons).get("validate_type").toString());
 
 			RESULT = myJson;
 		
@@ -2289,6 +2454,7 @@ class CUP$parser$actions {
 			myJson.put("ParentesisAbierto", pa.toString());
 			myJson.put("expression_list", (JSONObject) exp_list);
 			myJson.put("ParentesisCerrado", pc.toString());
+			myJson.put("validate_type", ((JSONObject) exp_list).get("validate_type").toString());
 			RESULT = myJson;
 		
               CUP$parser$result = parser.getSymbolFactory().newSymbol("factor",17, ((java_cup.runtime.Symbol)CUP$parser$stack.elementAt(CUP$parser$top-2)), ((java_cup.runtime.Symbol)CUP$parser$stack.peek()), RESULT);
@@ -2303,7 +2469,10 @@ class CUP$parser$actions {
 		int ccright = ((java_cup.runtime.Symbol)CUP$parser$stack.peek()).right;
 		Object cc = (Object)((java_cup.runtime.Symbol) CUP$parser$stack.peek()).value;
 		
-			RESULT = cc;
+			JSONObject myJson = new JSONObject();
+			myJson.put("value", cc.toString());
+			myJson.put("validate_type", "CHARACTER");
+			RESULT = myJson;
 		
               CUP$parser$result = parser.getSymbolFactory().newSymbol("constant",19, ((java_cup.runtime.Symbol)CUP$parser$stack.peek()), ((java_cup.runtime.Symbol)CUP$parser$stack.peek()), RESULT);
             }
@@ -2317,7 +2486,10 @@ class CUP$parser$actions {
 		int csright = ((java_cup.runtime.Symbol)CUP$parser$stack.peek()).right;
 		Object cs = (Object)((java_cup.runtime.Symbol) CUP$parser$stack.peek()).value;
 		
-			RESULT = cs;
+			JSONObject myJson = new JSONObject();
+			myJson.put("value", cs.toString());
+			myJson.put("validate_type", "STRING");
+			RESULT = myJson;
 		
               CUP$parser$result = parser.getSymbolFactory().newSymbol("constant",19, ((java_cup.runtime.Symbol)CUP$parser$stack.peek()), ((java_cup.runtime.Symbol)CUP$parser$stack.peek()), RESULT);
             }
@@ -2377,12 +2549,24 @@ class CUP$parser$actions {
           case 81: // records ::= Var Variable AsignacionIgual Record lista_record_values End 
             {
               Object RESULT =null;
+		int varleft = ((java_cup.runtime.Symbol)CUP$parser$stack.elementAt(CUP$parser$top-5)).left;
+		int varright = ((java_cup.runtime.Symbol)CUP$parser$stack.elementAt(CUP$parser$top-5)).right;
+		Object var = (Object)((java_cup.runtime.Symbol) CUP$parser$stack.elementAt(CUP$parser$top-5)).value;
 		int vleft = ((java_cup.runtime.Symbol)CUP$parser$stack.elementAt(CUP$parser$top-4)).left;
 		int vright = ((java_cup.runtime.Symbol)CUP$parser$stack.elementAt(CUP$parser$top-4)).right;
 		Object v = (Object)((java_cup.runtime.Symbol) CUP$parser$stack.elementAt(CUP$parser$top-4)).value;
+		int aileft = ((java_cup.runtime.Symbol)CUP$parser$stack.elementAt(CUP$parser$top-3)).left;
+		int airight = ((java_cup.runtime.Symbol)CUP$parser$stack.elementAt(CUP$parser$top-3)).right;
+		Object ai = (Object)((java_cup.runtime.Symbol) CUP$parser$stack.elementAt(CUP$parser$top-3)).value;
+		int recleft = ((java_cup.runtime.Symbol)CUP$parser$stack.elementAt(CUP$parser$top-2)).left;
+		int recright = ((java_cup.runtime.Symbol)CUP$parser$stack.elementAt(CUP$parser$top-2)).right;
+		Object rec = (Object)((java_cup.runtime.Symbol) CUP$parser$stack.elementAt(CUP$parser$top-2)).value;
 		int lvrleft = ((java_cup.runtime.Symbol)CUP$parser$stack.elementAt(CUP$parser$top-1)).left;
 		int lvrright = ((java_cup.runtime.Symbol)CUP$parser$stack.elementAt(CUP$parser$top-1)).right;
 		Object lvr = (Object)((java_cup.runtime.Symbol) CUP$parser$stack.elementAt(CUP$parser$top-1)).value;
+		int eleft = ((java_cup.runtime.Symbol)CUP$parser$stack.peek()).left;
+		int eright = ((java_cup.runtime.Symbol)CUP$parser$stack.peek()).right;
+		Object e = (Object)((java_cup.runtime.Symbol) CUP$parser$stack.peek()).value;
 		
 			ArrayList<Record_Attribute> attributes = (ArrayList<Record_Attribute> ) lvr;
 			Token token = new Token(v, vright + 1, vleft + 1);
@@ -2391,6 +2575,19 @@ class CUP$parser$actions {
 			SymbolRow sr = new SymbolRow(token, type, scope, offset);
 			offset++;
 			sym_table.addSymbol(sr);
+
+			JSONObject myJson = new JSONObject();
+			myJson.put("Var", var.toString());
+			myJson.put("Variable", v.toString());
+			myJson.put("AsignacionIgual", ai.toString());
+			myJson.put("Record", rec.toString());
+			JSONArray values = new JSONArray();
+			for(Record_Attribute value : (ArrayList<Record_Attribute>) lvr) {
+				values.add(value.toString());		
+			}
+			myJson.put("lista_record_values", values);
+			myJson.put("End", e.toString());
+			RESULT = myJson;
 		 
               CUP$parser$result = parser.getSymbolFactory().newSymbol("records",28, ((java_cup.runtime.Symbol)CUP$parser$stack.elementAt(CUP$parser$top-5)), ((java_cup.runtime.Symbol)CUP$parser$stack.peek()), RESULT);
             }
