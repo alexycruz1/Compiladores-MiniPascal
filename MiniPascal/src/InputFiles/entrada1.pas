@@ -7,8 +7,16 @@ PROGRAM EJER37;
    bookID:boolean;
  END;
 {---------------Funcion------------------}
+{-----------------Procedure---------------}
+procedure foo;
+VAR result3:INTEGER;
+begin
+   write('Estamos dentro del procedimiento',variable);
+end;
+{-----------------------------------------}
  FUNCTION max(num1, num2:INTEGER):INTEGER;
-  VAR result:INTEGER;
+  VAR result1:INTEGER;
+  VAR result2:INTEGER;
   BEGIN
    IF (4 > 5) THEN
    BEGIN
@@ -19,12 +27,6 @@ PROGRAM EJER37;
       result := 10;
    max := 11;
   END;
-{-----------------------------------------}
-{-----------------Procedure---------------}
-procedure foo;
-begin
-   write('Estamos dentro del procedimiento',variable);
-end;
 {-----------------------------------------}
 
  BEGIN

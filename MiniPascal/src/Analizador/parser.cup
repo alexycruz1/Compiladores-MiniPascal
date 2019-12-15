@@ -28,19 +28,19 @@ parser code {:
 				System.out.println(message + " " + " (line "+line+", column "+column+")");
 			}
 		}
-		System.err.println(message);
+		System.out.println(message);
 	}
 	public void syntax_error(Symbol s){
 		String val = s.value != null ? s.value.toString() : getTokenName(s.sym);
 		//errors.add("Error sintactico en la linea: " + s.left +" columna: "+ s.right + " simbolo: " + val);
-		System.err.println("Error sintactico en la linea: " + s.left +" columna: "+ s.right + " simbolo: " + val);
+		System.out.println("Error sintactico en la linea: " + s.left +" columna: "+ s.right + " simbolo: " + val);
 	}
 
 	public void unrecovered_syntax_error(Symbol s) {
 		if (s.left < 1 || s.left < 1) return;
 		String val = s.value != null ? s.value.toString() : getTokenName(s.sym);
 		//errors.add("Error sintactico en la linea: " + s.left +" columna: "+ s.right + " simbolo: " + val);
-		System.err.println("Error sintactico en la linea: " + s.left +" columna: "+ s.right + " simbolo: " + val);
+		System.out.println("Error sintactico en la linea: " + s.left +" columna: "+ s.right + " simbolo: " + val);
 
 	}
 
@@ -131,11 +131,12 @@ identifier_list ::=
 declarations ::=
 	declarations Var identifier_list: idl AsignacionTipo type: t FinalInstruccion
 		{:
+			
 			ArrayList ids = ((ArrayList) idl);
 			for(int i = 0; i < ids.size(); i++) {
 				Token token = (Token)ids.get(i);
 				CustomType type = new CustomType(tright + 1, tleft + 1, t.toString());
-				Scope scope = new Scope(current_scope);
+				Scope scope = new Scope(current_scope.clone());
 				SymbolRow sr = new SymbolRow(token, type, scope, offset);
 				offset++;
 				sym_table.addSymbol(sr);
@@ -180,8 +181,8 @@ char_declaration ::=
 			ArrayList ids = ((ArrayList) idl);
 			for(int i = 0; i < ids.size(); i++) {
 				Token token = (Token)ids.get(i);
-				CharacterType type = new CharacterType(tright + 1, tleft + 1);
-				Scope scope = new Scope(current_scope);
+				CustomType type = new CustomType(tright + 1, tleft + 1, t.toString());
+				Scope scope = new Scope(current_scope.clone());
 				SymbolRow sr = new SymbolRow(token, type, scope, offset);
 				offset++;
 				sym_table.addSymbol(sr);
@@ -197,8 +198,8 @@ integer_declaration ::=
 			ArrayList ids = ((ArrayList) idl);
 			for(int i = 0; i < ids.size(); i++) {
 				Token token = (Token)ids.get(i);
-				IntegerType type = new IntegerType(tright + 1, tleft + 1);
-				Scope scope = new Scope(current_scope);
+				CustomType type = new CustomType(tright + 1, tleft + 1, t.toString());
+				Scope scope = new Scope(current_scope.clone());
 				SymbolRow sr = new SymbolRow(token, type, scope, offset);
 				offset++;
 				sym_table.addSymbol(sr);
@@ -214,8 +215,8 @@ boolean_declaration ::=
 			ArrayList ids = ((ArrayList) idl);
 			for(int i = 0; i < ids.size(); i++) {
 				Token token = (Token)ids.get(i);
-				BooleanType type = new BooleanType(tright + 1, tleft + 1);
-				Scope scope = new Scope(current_scope);
+				CustomType type = new CustomType(tright + 1, tleft + 1, t.toString());
+				Scope scope = new Scope(current_scope.clone());
 				SymbolRow sr = new SymbolRow(token, type, scope, offset);
 				offset++;
 				sym_table.addSymbol(sr);
@@ -328,14 +329,15 @@ parameter_list ::=
 // compound_statement //
 compound_statement ::=
 	Begin
+		{:
+		:}
 	optional_statements
 	End
 		{: 
-			/*
+
 			if(current_scope.size() > 0) {				
 				current_scope.remove(current_scope.size()-1);
 			}
-			*/
 		:}
 	;
 // \ compound_statement //
@@ -734,7 +736,7 @@ records ::=
 			ArrayList<Record_Attribute> attributes = (ArrayList<Record_Attribute> ) lvr;
 			Token token = new Token(v, vright + 1, vleft + 1);
 			RecordType type = new RecordType(token, attributes, vright + 1, vleft + 1);
-			Scope scope = new Scope(current_scope);
+			Scope scope = new Scope(current_scope.clone());
 			SymbolRow sr = new SymbolRow(token, type, scope, offset);
 			offset++;
 			sym_table.addSymbol(sr);
