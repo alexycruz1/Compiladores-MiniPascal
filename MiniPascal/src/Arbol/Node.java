@@ -1,5 +1,6 @@
 package Arbol;
 import java.util.ArrayList;
+import CodigoIntermedio.CodigoIntermedio;
 
 public class Node {
 
@@ -158,5 +159,15 @@ public class Node {
 
     public String getType() {
         return value;
+    }
+
+    public CodigoIntermedio GenerarCodigo(CodigoIntermedio codI){
+            if(sons.get(0).sons.size()>1){
+                codI=sons.get(0).GenerarCodigo(codI);
+                codI.agregarCodigo("RET "+ codI.ultimoTemporal());
+            }else{
+                codI.agregarCodigo("RET "+ sons.get(0).sons.get(0).label);
+            }
+        return codI;
     }
 }
