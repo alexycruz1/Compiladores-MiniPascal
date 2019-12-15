@@ -1,23 +1,33 @@
 package Analizador;
 import java_cup.runtime.*;
+import org.json.simple.*;
 import java.util.ArrayList;
 import Arbol.*;
 import Table.*;
 import Types.*;
 
-parser code {: 
+parser code {:
 
+	public ArrayList<String> errors = new ArrayList(); 
 	public int offset = 0;
 	public ArrayList current_scope = new ArrayList();
 
 	public String Intermediate_code = "";
 	public SymbolTable sym_table = new SymbolTable();
+	public String current_type = "";
+	public String current_operator = "";
 
 	public Node myTree = new Node("INIT");
 
 
 	public Node getMyTree(){
 		return myTree;
+	}
+
+	public void backScope() {		
+		if(current_scope.size() > 0) {				
+			current_scope.remove(current_scope.size()-1);
+		}
 	}
 
 	public void report_error(String message, Object info) {
@@ -37,7 +47,7 @@ parser code {:
 	}
 
 	public void unrecovered_syntax_error(Symbol s) {
-		if (s.left < 1 || s.left < 1) return;
+		if (s.left < 1 ||s.left < 1) return;
 		String val = s.value != null ? s.value.toString() : getTokenName(s.sym);
 		//errors.add("Error sintactico en la linea: " + s.left +" columna: "+ s.right + " simbolo: " + val);
 		System.out.println("Error sintactico en la linea: " + s.left +" columna: "+ s.right + " simbolo: " + val);
@@ -83,26 +93,51 @@ terminal Begin, End, For, Function, If, To, Do, Else, Then, Until, While, Write,
 
 non terminal program, identifier_list, declarations, subprogram_declaration, compound_statement, type,
 		standard_type, subprogram_declarations, subprogram_head, arguments, parameter_list, optional_statements,
-		statement_list, statement, expression, procedure_statement, tail, expression_list, factor, mult_expression, 
-		constant, constant_character, constant_string, variable, simple_expression, write_function, read_function,
+		statement_list, statement, expression, procedure_statement, expression_list, factor, mult_expression, 
+		constant, constant_character, constant_string, simple_expression, write_function, read_function,
 		relation, extra_expression, final_instruccion_error, records, lista_record_values, char_declaration, 
 		integer_declaration, boolean_declaration;
 		
 // program //
 program ::=
-	Program Variable final_instruccion_error declarations subprogram_declarations compound_statement Punto
+	Program Variable: v
 		{:
+			current_scope.add(v);
+		:}
+	final_instruccion_error declarations subprogram_declarations compound_statement Punto
+		{:
+			if(errors.size() == 0) {
+				System.out.println("COMPILADO CON EXITO");				
+			} else {
+				for(String error : errors){
+					System.out.println(error);
+				}
+				System.out.println("\t\t--- COMPILACIÓN FALLIDA ---");
+			}
 
-			System.out.println("COMPILADO CON EXITO");
+			//backScope();
+			
 			System.out.println(sym_table);
-
 		:}
 		|
-	Program final_instruccion_error declarations subprogram_declarations compound_statement Punto
+	Program 
 		{:
-			System.out.println("COMPILADO CON EXITO");
-			System.out.println(sym_table);
+			current_scope.add("ROOT");
+		:}
+	final_instruccion_error declarations subprogram_declarations compound_statement Punto
+		{:
+			if(errors.size() == 0) {
+				System.out.println("COMPILADO CON EXITO");				
+			} else {
+				for(String error : errors){
+					System.out.println(error);
+				}
+				System.out.println("\t\t--- COMPILACIÓN FALLIDA ---");
+			}
 
+			//backScope();
+
+			System.out.println(sym_table);
 		:}
 	;
 // \ program //
@@ -252,15 +287,15 @@ standard_type ::=
 subprogram_declarations ::=
 	subprogram_declarations subprogram_declaration final_instruccion_error
 		{:
-
+			
 		:}
 		|
-	subprogram_declarations final_instruccion_error
+		subprogram_declarations final_instruccion_error
 		{:
-
+			
 		:}
 		|
-		{:
+		{:			
 			// Empty
 		:}
 	; 
@@ -268,32 +303,48 @@ subprogram_declarations ::=
 
 // subprogram_declaration //
 subprogram_declaration ::=
-	subprogram_head declarations
+	subprogram_head declarations compound_statement	
 		{:
-			// antes de que termine la ejecución de este bloque
-			System.out.println(sym_table);
-		:}
-	compound_statement
-		{:
-			
+			backScope();
 		:}
 	;
 // \ subprogram_declaration //
 
 // subprogram_head //
 subprogram_head ::=
-	Function Variable: v arguments AsignacionTipo standard_type final_instruccion_error
+	Function:p Variable: v arguments AsignacionTipo: t standard_type final_instruccion_error
 		{:
+			Token token = new Token(v, vright + 1, vleft + 1);
+			CustomType type = new CustomType(pright + 1, pleft + 1, p.toString());
+			Scope scope = new Scope(current_scope.clone());
+			SymbolRow sr = new SymbolRow(token, type, scope, offset);
+			offset++;
+			sym_table.addSymbol(sr);
+
 			current_scope.add(v);
 		:}
 		|
-	Function Variable: v arguments AsignacionTipo final_instruccion_error
+	Function: p Variable: v arguments AsignacionTipo: t final_instruccion_error
 		{:
+			Token token = new Token(v, vright + 1, vleft + 1);
+			CustomType type = new CustomType(pright + 1, pleft + 1, p.toString());
+			Scope scope = new Scope(current_scope.clone());
+			SymbolRow sr = new SymbolRow(token, type, scope, offset);
+			offset++;
+			sym_table.addSymbol(sr);
+
 			current_scope.add(v);
 		:}
 		|
-	Procedure Variable: v arguments FinalInstruccion
+	Procedure: p Variable: v arguments FinalInstruccion
 		{:
+			Token token = new Token(v, vright + 1, vleft + 1);
+			CustomType type = new CustomType(pright + 1, pleft + 1, p.toString());
+			Scope scope = new Scope(current_scope.clone());
+			SymbolRow sr = new SymbolRow(token, type, scope, offset);
+			offset++;
+			sym_table.addSymbol(sr);
+
 			current_scope.add(v);
 		:}
 	;
@@ -302,11 +353,11 @@ subprogram_head ::=
 // arguments //
 arguments ::=
 	ParentesisAbierto parameter_list ParentesisCerrado
-		{: 
+		{:
 			
 		:}
 		|
-		{: 
+		{:
 			// Empty
 		:}
 	;
@@ -328,42 +379,40 @@ parameter_list ::=
 
 // compound_statement //
 compound_statement ::=
-	Begin
+	Begin: b optional_statements: os End: e
 		{:
-		:}
-	optional_statements
-	End
-		{: 
-
-			if(current_scope.size() > 0) {				
-				current_scope.remove(current_scope.size()-1);
-			}
+			JSONObject myJson = new JSONObject();
+			myJson.put("Begin", b.toString());
+			myJson.put("optional_statements", (JSONObject) os);
+			myJson.put("End", e.toString());
+			RESULT = myJson;
 		:}
 	;
 // \ compound_statement //
 
 // optional_statements //
 optional_statements ::=
-	statement_list:state_list
+	statement_list: state_list
 		{:
-			//System.out.println("LIST2: " + state_list);
+			JSONObject myJson = new JSONObject();
+			myJson.put("statement_list", (JSONObject) state_list);
+			RESULT = myJson;
 		:}
 		|
 		{:
 			// Empty
-		:} 
+		:}
 	;
 // \ optional_statements //
 
 // statement_list //
 statement_list ::=
-	statement: state FinalInstruccion
+	statement: state FinalInstruccion: fi
 		{:
-			ArrayList n = new ArrayList();
-			
-			n.add(state);
-
-			RESULT = n;
+			JSONObject myJson = new JSONObject();
+			myJson.put("statement", (JSONObject) state);
+			myJson.put("FinalInstruccion", fi.toString());
+			RESULT = myJson;
 		:}
 		|
 	error FinalInstruccion
@@ -371,15 +420,13 @@ statement_list ::=
 			parser.report_error("Error en el statement", null);
 		:}
 		|
-	statement_list: state_list statement:state FinalInstruccion
-		{: 
-			//System.out.println("LIST: " + state_list);
-			ArrayList n = new ArrayList();
-			
-			n.add(state);
-			n.addAll((ArrayList)state_list);
-
-			RESULT = n;
+	statement_list: state_list statement: state FinalInstruccion: fi
+		{:
+			JSONObject myJson = new JSONObject();
+			myJson.put("statement_list", (JSONObject) state_list);
+			myJson.put("statement", (JSONObject) state);
+			myJson.put("FinalInstruccion", fi.toString());
+			RESULT = myJson;
 		:}
 		|
 	statement_list error FinalInstruccion
@@ -391,42 +438,59 @@ statement_list ::=
 
 // statement //
 statement ::=
-	variable: var AsignacionVariable expression: exp
+	Variable: v AsignacionVariable: av expression: exp
 		{:
-			ExpressionNode p = new ExpressionNode("Expression", (ExpressionNode)var, (ExpressionNode)exp); 
-			myTree = p;
-			RESULT = p;
-		:}
-		|
-	procedure_statement
-		{:
+			JSONObject myJson = new JSONObject();
+			SymbolRow current_var = sym_table.find(v.toString(), current_scope);
+			if(current_var == null) {
+				errors.add("Error: No existe la variable " + v + " (" + (vleft + 1) + ", " + (vright +1) +")." );
+				myJson.put("Error", new Boolean(true));
+			}
 
+			myJson.put("Variable", v.toString());
+			myJson.put("AsignacionVariable", av.toString());
+			myJson.put("expression", (JSONObject) exp);
+			RESULT = myJson;
 		:}
 		|
-	compound_statement
+	procedure_statement: ps
 		{:
-
+			JSONObject myJson = new JSONObject();
+			myJson.put("procedure_statement", (JSONObject) ps);
+			RESULT = myJson;
 		:}
 		|
-	write_function
+	compound_statement: cs
 		{:
-
+			JSONObject myJson = new JSONObject();
+			myJson.put("compound_statement", (JSONObject) cs);
+			RESULT = myJson;
 		:}
 		|
-	read_function
+	write_function: w
 		{:
-
+			JSONObject myJson = new JSONObject();
+			myJson.put("write_function", (JSONObject) w);
+			RESULT = myJson;
 		:}
 		|
-	If expression Then statement: if_state Else statement: if_else_state
-		{: 
-			IfNode ifNode = new IfNode("If");
-			
-			/*ifNode.createBodyNode((ArrayList)if_state);         
-			ifNode.createElseNode((ArrayList)if_else_state);*/
-			
-			myTree = ifNode;
-			RESULT = ifNode;
+	read_function: r
+		{:
+			JSONObject myJson = new JSONObject();
+			myJson.put("read_function", (JSONObject) r);
+			RESULT = myJson;
+		:}
+		|
+	If: i expression: exp Then: t statement: if_state Else: els statement: if_else_state
+		{:
+			JSONObject myJson = new JSONObject();
+			myJson.put("If", i.toString());
+			myJson.put("expression", (JSONObject) exp);
+			myJson.put("Then", t.toString());
+			myJson.put("statement", (JSONObject) if_state);
+			myJson.put("Else", els.toString());
+			myJson.put("statement", (JSONObject) if_else_state);
+			RESULT = myJson;
 		:}
 		|
 	If error
@@ -434,12 +498,14 @@ statement ::=
 			parser.report_error("Error en el If", null);
 		:}
 		|
-	While expression: exp Do statement: state
-		{: 
-			WhileNode whileNode = new WhileNode(new ExpressionNode("Expression", (ExpressionNode)exp), (Node)state);
-
-			myTree = whileNode;
-			RESULT = whileNode;
+	While: w expression: exp Do: do statement: state
+		{:
+			JSONObject myJson = new JSONObject();
+			myJson.put("While", w.toString());
+			myJson.put("expression", (JSONObject) exp);
+			myJson.put("Do", do.toString());
+			myJson.put("statement", (JSONObject) state);
+			RESULT = myJson;			
 		:}
 		|
 	While error
@@ -447,12 +513,18 @@ statement ::=
 			parser.report_error("Error en el While", null);
 		:}
 		|
-	For Variable AsignacionVariable factor To expression: exp Do statement: state
-		{:  
-			ForNode forNode = new ForNode(new Node("Variable"), new Node("Factor"), new ExpressionNode("Expression", (ExpressionNode)exp), (Node)state);
-
-			myTree = forNode;
-			RESULT = forNode;
+	For: f Variable: v AsignacionVariable: av factor: f To: to expression: exp Do: do statement: state
+		{:
+			JSONObject myJson = new JSONObject();
+			myJson.put("For", f.toString());
+			myJson.put("Variable", v.toString());
+			myJson.put("AsignacionVariable", av.toString());
+			myJson.put("factor", (JSONObject) f);
+			myJson.put("To", to.toString());
+			myJson.put("expression", (JSONObject) exp);
+			myJson.put("Do", do.toString());
+			myJson.put("statement", (JSONObject) state);
+			RESULT = myJson;
 		:}
 		|
 	For error
@@ -460,12 +532,16 @@ statement ::=
 			parser.report_error("Error en el For", null);
 		:}
 		|
-	Repeat statement: state Until Variable AsignacionIgual expression: exp
-		{: 
-			RepeatNode repeatNode = new RepeatNode((Node)state, new Node("Variable"), new ExpressionNode("Expression", (ExpressionNode)exp));
-		
-			myTree = repeatNode;
-			RESULT = repeatNode;
+	Repeat:r statement: state Until: u Variable: v AsignacionIgual: ai expression: exp
+		{:
+			JSONObject myJson = new JSONObject();
+			myJson.put("Repeat", r.toString());
+			myJson.put("statement", (JSONObject) state);
+			myJson.put("Until", u.toString());
+			myJson.put("Variable", v.toString());
+			myJson.put("AsignacionIgual", ai.toString());
+			myJson.put("expression", (JSONObject) exp);
+			RESULT = myJson;
 		:}
 		|
 	Repeat error
@@ -477,59 +553,61 @@ statement ::=
 
 // write_function //
 write_function ::=
-	Write ParentesisAbierto constant_string Coma Variable ParentesisCerrado
+	Write: w ParentesisAbierto: pa constant_string: cs Coma: coma Variable: v ParentesisCerrado: pc
 		{:
-
+			JSONObject myJson = new JSONObject();
+			myJson.put("Write", w.toString());
+			myJson.put("ParentesisAbierto", pa.toString());
+			myJson.put("constant_string", (JSONObject) cs);
+			myJson.put("Coma", coma.toString());
+			myJson.put("Variable", v.toString());
+			myJson.put("ParentesisCerrado", pc.toString());
+			RESULT = myJson;
 		:}
 		|
-	Write ParentesisAbierto constant_string ParentesisCerrado
+	Write: w ParentesisAbierto: pc constant_string: cs ParentesisCerrado: pc
 		{:
-
+			JSONObject myJson = new JSONObject();
+			myJson.put("Write", w.toString());
+			myJson.put("ParentesisAbierto", pa.toString());
+			myJson.put("constant_string", cs.toString());
+			myJson.put("ParentesisCerrado", pc.toString());
+			RESULT = myJson;
 		:}
 	;
 // \ write_function //
 
 // read_function //
 read_function ::=
-	Read ParentesisAbierto Variable ParentesisCerrado
+	Read: r ParentesisAbierto: pa Variable: v ParentesisCerrado: pc
 		{:
-
+			JSONObject myJson = new JSONObject();
+			myJson.put("Read", r.toString());
+			myJson.put("ParentesisAbierto", pa.toString());
+			myJson.put("Variable", (JSONObject) v);
+			myJson.put("ParentesisCerrado", pc.toString());
+			RESULT = myJson;
 		:}
 	;
 // \ read_function //
 
-// variable //
-variable ::=
-	Variable tail
-		{:
-
-		:}
-	;
-// \ variable //
-
-// tail //
-tail ::=
-	expression tail
-		{:
-
-		:}
-		| 
-		{:
-			// Empty
-		:}
-	;
-// \ tail //
-
 // procedure_statement //
 procedure_statement ::=
-	Variable
+	Variable: v
 		{:
-
+			JSONObject myJson = new JSONObject();
+			myJson.put("Variable", v.toString());
+			RESULT = myJson;
 		:}
 		|
-	Variable ParentesisAbierto expression_list ParentesisCerrado
+	Variable: v ParentesisAbierto: pa expression_list: el ParentesisCerrado: pc
 		{:
-
+			JSONObject myJson = new JSONObject();
+			myJson.put("Variable", v.toString());
+			myJson.put("ParentesisAbierto", pa.toString());
+			myJson.put("expression_list", (JSONObject) el);
+			myJson.put("ParentesisCerrado", pc.toString());
+			RESULT = myJson;
 		:}
 	;
 // \ procedure_statement //
@@ -538,9 +616,10 @@ procedure_statement ::=
 expression_list ::=
 	expression: exp extra_expression: ex_exp
 		{:
-			ExpressionNode p = new ExpressionNode("Expression", (ExpressionNode)exp, (ExpressionNode)ex_exp); 
-			myTree = p;
-			RESULT = p;
+			JSONObject myJson = new JSONObject();
+			myJson.put("expression", (JSONObject) exp);
+			myJson.put("extra_expression", (JSONObject) ex_exp);
+			RESULT = myJson;
 		:}
 	;
 // \ expression_list //
@@ -549,21 +628,27 @@ expression_list ::=
 expression ::=
 	expression: exp And: and relation: rel
 		{:
-			ExpressionNode p = new ExpressionNode("Expression", (ExpressionNode)exp, new Node("and"), (ExpressionNode)rel); 
-			myTree = p;
-			RESULT = p;
+			JSONObject myJson = new JSONObject();
+			myJson.put("expression", (JSONObject) exp);
+			myJson.put("And", and.toString());
+			myJson.put("relation", (JSONObject) rel);
+			RESULT = myJson;
 		:}
 		|
 	expression: exp Or: or relation: rel
 		{:
-			ExpressionNode p = new ExpressionNode("Expression", (ExpressionNode)exp, new Node("or"), (ExpressionNode)rel);
-			myTree = p;
-			RESULT = p; 
+			JSONObject myJson = new JSONObject();
+			myJson.put("expression", (JSONObject) exp);
+			myJson.put("Or", or.toString());
+			myJson.put("relation", (JSONObject) rel);
+			RESULT = myJson;
 		:}
 		|
 	relation: rel
 		{:
-			RESULT = rel;
+			JSONObject myJson = new JSONObject();
+			myJson.put("relation", (JSONObject) rel);
+			RESULT = myJson;
 		:}
 		|
 	error
@@ -575,11 +660,13 @@ expression ::=
 
 // extra_expression //
 extra_expression ::=
-	Coma expression: exp extra_expression: ex_exp
+	Coma: coma expression: exp extra_expression: ex_exp
 		{:
-			ExpressionNode p = new ExpressionNode("Expression", (ExpressionNode)exp, (ExpressionNode)ex_exp); 
-			myTree = p;
-			RESULT = p;
+			JSONObject myJson = new JSONObject();
+			myJson.put("Coma", coma.toString());
+			myJson.put("expression", (JSONObject) exp);
+			myJson.put("extra_expression", (JSONObject) ex_exp);
+			RESULT = myJson;
 		:}
 		|
 		{:
@@ -592,21 +679,27 @@ extra_expression ::=
 relation ::=
 	simple_expression: simp_exp
 		{:
-			RESULT = simp_exp;
+			JSONObject myJson = new JSONObject();
+			myJson.put("simple_expression", (JSONObject) simp_exp);
+			RESULT = myJson;
 		:}
 		|
 	simple_expression: simp_exp OpRel: oprel simple_expression: simp_exp2
 		{:
-			ExpressionNode p = new ExpressionNode("Expression", (ExpressionNode)simp_exp, new Node("Operador Relacional"), (ExpressionNode)simp_exp2); 
-			myTree = p;
-			RESULT = p;
+			JSONObject myJson = new JSONObject();
+			myJson.put("simple_expression", (JSONObject) simp_exp);
+			myJson.put("OpRel", oprel.toString());
+			myJson.put("simple_expression", (JSONObject) simp_exp2);
+			RESULT = myJson;
 		:}
 		|
 	simple_expression: simp_exp AsignacionIgual: asignacion_igual simple_expression: simp_exp2
 		{:
-			ExpressionNode p = new ExpressionNode("Expression", (ExpressionNode)simp_exp, new Node("Asignacion Igual"), (ExpressionNode)simp_exp2); 
-			myTree = p;
-			RESULT = p;
+			JSONObject myJson = new JSONObject();
+			myJson.put("simple_expression", (JSONObject) simp_exp);
+			myJson.put("AsignacionIgual", asignacion_igual.toString());
+			myJson.put("simple_expression", (JSONObject) simp_exp2);
+			RESULT = myJson;
 		:}
 	;
 // \ relation //
@@ -615,14 +708,18 @@ relation ::=
 simple_expression ::=
 	simple_expression: simp_exp OpSuma: opsuma mult_expression: mult_exp
 		{:
-			ExpressionNode p = new ExpressionNode("Expression", (ExpressionNode)simp_exp, new Node("Operador Suma"), (ExpressionNode)mult_exp); 
-			myTree = p;
-			RESULT = p;
+			JSONObject myJson = new JSONObject();
+			myJson.put("simple_expression", (JSONObject) simp_exp);
+			myJson.put("OpSuma", opsuma.toString());
+			myJson.put("mult_expression", (JSONObject) mult_exp);
+			RESULT = myJson;
 		:}
 		|
 	mult_expression: mult_exp
 		{:
-			RESULT = mult_exp;
+			JSONObject myJson = new JSONObject();
+			myJson.put("mult_expression", (JSONObject) mult_exp);
+			RESULT = myJson;
 		:}
 	;
 // \ simple_expression //
@@ -631,14 +728,18 @@ simple_expression ::=
 mult_expression ::=
 	mult_expression: mult_exp OpMult: opmult factor: fac
 		{:
-			ExpressionNode p = new ExpressionNode("Expression", (ExpressionNode)mult_exp, new Node("Operador Multiplicacion"), new Node("Factor")); 
-			myTree = p;
-			RESULT = p;
+			JSONObject myJson = new JSONObject();
+			myJson.put("mult_expression", (JSONObject) mult_exp);
+			myJson.put("OpMult", opmult.toString());
+			myJson.put("factor", (JSONObject) fac);
+			RESULT = myJson;
 		:}
 		|
 	factor: fac
 		{:
-			RESULT = fac;
+			JSONObject myJson = new JSONObject();
+			myJson.put("factor", (JSONObject) fac);
+			RESULT = myJson;
 		:}
 	;
 // \ mult_expression //
@@ -647,38 +748,92 @@ mult_expression ::=
 factor ::=
 	Numero: numero
 		{:
-			Node n = new Node("Numero");
-			n.setValue("Integer");
-			ExpressionNode p = new ExpressionNode("Expression" , n);
-			RESULT = p;
+			JSONObject myJson = new JSONObject();
+			current_type = "INTEGER";
+			myJson.put("type", "INTEGER");
+			myJson.put("value", new Integer(numero.toString()));
+			
+			// Para el arbol
+			JSONArray facts = new JSONArray();
+			facts.add(new Integer(numero.toString()));
+			myJson.put("tree", facts);
+			//
+
+			RESULT = myJson;
 		:}
 		|
-	Variable: var
-		{:	
-			Node n = new Node("Variable");
-			n.setValue("Variable");
-			ExpressionNode p = new ExpressionNode("Expression", n);
-			RESULT = p;
+	Variable: v
+		{:
+			JSONObject myJson = new JSONObject();
+			SymbolRow current_var = sym_table.find(v.toString(), current_scope);
+			if(current_var == null) {
+				errors.add("Error: No existe la variable " + v + " (" + (vleft + 1) + ", " + (vright +1) +")." );
+				myJson.put("type", "UNKNOWN");
+				myJson.put("error", new Boolean(true));
+			} else {
+				current_type = current_var.type.type;
+				myJson.put("type", "INTEGER");
+				JSONArray path = new JSONArray();
+				for(Object value : current_var.scope.path) {
+					path.add(value.toString());		
+				}
+				myJson.put("scope", path );
+			}
+			myJson.put("id", v.toString());
+
+			// Para el arbol
+			JSONArray facts = new JSONArray();
+			facts.add(v.toString());
+			myJson.put("tree", facts);
+			//
+
+			RESULT = myJson;
 		:}
 		|
 	Not: not factor: fac
-		{:
-			Node n = new Node("Not");
-			n.setValue("Not");
-			ExpressionNode p = new ExpressionNode("Expression" , n, new Node("Factor"));
-			RESULT = p; 
+		{:		
+			JSONObject myJson = new JSONObject();
+			
+			if(!current_type.equals("BOOLEAN")) {
+				errors.add("Error: Intenta negar una expresión de tipo no BOOLEAN (" + (facleft + 1) + ", " + (facright +1) +")." );
+				myJson.put("error", new Boolean(true));
+			}
+			myJson.put("type", current_type);
+
+			// Para el arbol
+			JSONArray facts = new JSONArray();
+			facts.add(not.toString());
+			facts.add((JSONArray) ((JSONObject) fac).get("tree"));
+			myJson.put("tree", facts);
+			//
+
+			RESULT = myJson;
 		:}
 		|
 	constant: cons
 		{:
-			RESULT = cons;
+			JSONObject myJson = new JSONObject();
+
+			current_type = cons.toString().toUpperCase();
+
+			myJson.put("type", cons.toString().toUpperCase());
+
+			// Para el arbol
+			JSONArray facts = new JSONArray();
+			facts.add(cons.toString());
+			myJson.put("tree", facts);
+			//
+
+			RESULT = myJson;
 		:}
 		|
-	ParentesisAbierto expression_list: exp_list ParentesisCerrado
+	ParentesisAbierto: pa expression_list: exp_list ParentesisCerrado: pc
 		{:
-			ExpressionNode p = new ExpressionNode("Expression", (ExpressionNode)exp_list); 
-			myTree = p;
-			RESULT = p; 
+			JSONObject myJson = new JSONObject();
+			myJson.put("ParentesisAbierto", pa.toString());
+			myJson.put("expression_list", (JSONObject) exp_list);
+			myJson.put("ParentesisCerrado", pc.toString());
+			RESULT = myJson;
 		:}
 	;
 // \ factor //
@@ -731,8 +886,8 @@ final_instruccion_error ::=
 
 // records //
 records ::=
-	Var Variable: v AsignacionIgual Record lista_record_values:lvr End
-		{: 
+	Var Variable: v AsignacionIgual Record lista_record_values: lvr End
+		{:
 			ArrayList<Record_Attribute> attributes = (ArrayList<Record_Attribute> ) lvr;
 			Token token = new Token(v, vright + 1, vleft + 1);
 			RecordType type = new RecordType(token, attributes, vright + 1, vleft + 1);
@@ -761,7 +916,7 @@ lista_record_values ::=
 		:}
 		|
 		{:
-			// Empty	
+			// Empty
 		:}
 	;
 // \ lista_record_values //

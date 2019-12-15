@@ -16,12 +16,12 @@ public class RecordType extends CustomType {
     public RecordType(Token self, ArrayList<Record_Attribute> attributes, int row, int col) {
         super(row, col);
         this.self = self;
-        this.attributes = attributes; 
+        this.attributes = attributes;
     }
 
     @Override
     public String toString() {
-        return "RecordType{" + "attributes=" + attributes + ", self=" + self + '}';
+        return "RECORD(" + attributes.toString().replaceAll(",", "X").replaceAll("\\[|]", "") + ')';
     }
 
 }

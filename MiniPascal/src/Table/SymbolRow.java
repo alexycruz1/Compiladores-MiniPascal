@@ -22,7 +22,7 @@ public class SymbolRow {
 
   @Override
   public String toString() {
-    return "| " + id + " | " + type.toString() + " | " + scope.toString() + " | " + offset + " |";
+    return "| " + id + " | " + type.toString() + " | " + scope.toString().replaceAll("\\[|]", "") + " | " + offset + " |";
   }
 
 }

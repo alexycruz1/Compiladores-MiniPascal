@@ -15,5 +15,10 @@ public class Record_Attribute {
         this.token = token;
         this.type = type;
     }
+
+    @Override
+    public String toString() {
+        return "(" + token + " X " + type + ')';
+    }
     
 }

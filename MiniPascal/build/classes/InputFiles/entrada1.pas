@@ -9,7 +9,7 @@ PROGRAM EJER37;
 {---------------Funcion------------------}
 {-----------------Procedure---------------}
 procedure foo;
-VAR result3:INTEGER;
+   VAR result3:INTEGER;
 begin
    write('Estamos dentro del procedimiento',variable);
 end;
@@ -20,12 +20,13 @@ end;
   BEGIN
    IF (4 > 5) THEN
    BEGIN
-      result := 15;
-      result := 15;
+      result3 := not rs;
+      result3 := 15;
+      max := 11;
    END
    ELSE
-      result := 10;
-   max := 11;
+      result3 := 10;
+      max := 11;
   END;
 {-----------------------------------------}
 
