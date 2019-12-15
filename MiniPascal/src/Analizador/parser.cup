@@ -20,17 +20,18 @@ parser code {:
 
 	public Node myTree = new Node("INIT");
 
+	public JSONObject program_json = new JSONObject();
 
-	public void printTree(JSONObject obj){
+	public String printTree(JSONObject obj){
 		Gson gson = new GsonBuilder().setPrettyPrinting().create();
 		JsonParser jp = new JsonParser();
 		JsonElement je = jp.parse(obj.toString());
 		String prettyJsonString = gson.toJson(je);
-		System.out.println(prettyJsonString);
+		return prettyJsonString;
 	}
 
-	public void backScope() {		
-		if(current_scope.size() > 0) {				
+	public void backScope() {
+		if(current_scope.size() > 0) {
 			current_scope.remove(current_scope.size()-1);
 		}
 	}
@@ -130,7 +131,8 @@ program ::=
 			myJson.put("compound_statement", (JSONObject) cs);
 			myJson.put("Punto", punto.toString());
 
-			printTree(myJson);
+			program_json = myJson;
+			
 			RESULT = myJson;
 		:}
 		|
@@ -158,7 +160,7 @@ program ::=
 			myJson.put("compound_statement", (JSONObject) cs);
 			myJson.put("Punto", punto.toString());
 
-			printTree(myJson);
+			program_json = myJson;
 			RESULT = myJson;
 		:}
 	;
@@ -728,7 +730,7 @@ read_function ::=
 			JSONObject myJson = new JSONObject();
 			myJson.put("Read", r.toString());
 			myJson.put("ParentesisAbierto", pa.toString());
-			myJson.put("Variable", (JSONObject) v);
+			myJson.put("Variable",  v.toString());
 			myJson.put("ParentesisCerrado", pc.toString());
 			RESULT = myJson;
 		:}

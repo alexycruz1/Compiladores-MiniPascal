@@ -389,17 +389,18 @@ public class parser extends java_cup.runtime.lr_parser {
 
 	public Node myTree = new Node("INIT");
 
+	public JSONObject program_json = new JSONObject();
 
-	public void printTree(JSONObject obj){
+	public String printTree(JSONObject obj){
 		Gson gson = new GsonBuilder().setPrettyPrinting().create();
 		JsonParser jp = new JsonParser();
 		JsonElement je = jp.parse(obj.toString());
 		String prettyJsonString = gson.toJson(je);
-		System.out.println(prettyJsonString);
+		return prettyJsonString;
 	}
 
-	public void backScope() {		
-		if(current_scope.size() > 0) {				
+	public void backScope() {
+		if(current_scope.size() > 0) {
 			current_scope.remove(current_scope.size()-1);
 		}
 	}
@@ -544,7 +545,8 @@ class CUP$parser$actions {
 			myJson.put("compound_statement", (JSONObject) cs);
 			myJson.put("Punto", punto.toString());
 
-			printTree(myJson);
+			program_json = myJson;
+			
 			RESULT = myJson;
 		
               CUP$parser$result = parser.getSymbolFactory().newSymbol("program",0, ((java_cup.runtime.Symbol)CUP$parser$stack.elementAt(CUP$parser$top-7)), ((java_cup.runtime.Symbol)CUP$parser$stack.peek()), RESULT);
@@ -619,7 +621,7 @@ class CUP$parser$actions {
 			myJson.put("compound_statement", (JSONObject) cs);
 			myJson.put("Punto", punto.toString());
 
-			printTree(myJson);
+			program_json = myJson;
 			RESULT = myJson;
 		
               CUP$parser$result = parser.getSymbolFactory().newSymbol("program",0, ((java_cup.runtime.Symbol)CUP$parser$stack.elementAt(CUP$parser$top-6)), ((java_cup.runtime.Symbol)CUP$parser$stack.peek()), RESULT);
@@ -1788,7 +1790,7 @@ class CUP$parser$actions {
 			JSONObject myJson = new JSONObject();
 			myJson.put("Read", r.toString());
 			myJson.put("ParentesisAbierto", pa.toString());
-			myJson.put("Variable", (JSONObject) v);
+			myJson.put("Variable",  v.toString());
 			myJson.put("ParentesisCerrado", pc.toString());
 			RESULT = myJson;
 		
