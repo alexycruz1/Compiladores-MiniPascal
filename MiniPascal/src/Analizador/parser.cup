@@ -1,73 +1,84 @@
 package Analizador;
 import java_cup.runtime.*;
 import java.util.ArrayList;
+import Arbol.*;
+import Table.*;
+import Types.*;
 
 parser code {: 
-				public Node myTree = new Node("INIT");
 
-                public Node getMyTree(){
-                    return myTree;
-                }
+	public int offset = 0;
+	public ArrayList current_scope = new ArrayList();
 
-				public void report_error(String message, Object info) {
-                    if (info instanceof Symbol) {
-                        if (((Symbol)info).left != -1 && ((Symbol)info).right != -1) {
-                            int line = (((Symbol)info).left)+1;
-                            int column = (((Symbol)info).right)+1;
-                            System.out.println(message + " " + " (line "+line+", column "+column+")");
-                        }
-                    }
-                    System.err.println(message);
-                }
-                public void syntax_error(Symbol s){
-                    String val = s.value != null ? s.value.toString() : getTokenName(s.sym);
-                    //errors.add("Error sintactico en la linea: " + s.left +" columna: "+ s.right + " simbolo: " + val);
-                    System.err.println("Error sintactico en la linea: " + s.left +" columna: "+ s.right + " simbolo: " + val);
-                }
+	public String Intermediate_code = "";
+	public SymbolTable sym_table = new SymbolTable();
 
-                public void unrecovered_syntax_error(Symbol s) {
-                    if (s.left < 1 || s.left < 1) return;
-                    String val = s.value != null ? s.value.toString() : getTokenName(s.sym);
-                    //errors.add("Error sintactico en la linea: " + s.left +" columna: "+ s.right + " simbolo: " + val);
-                    System.err.println("Error sintactico en la linea: " + s.left +" columna: "+ s.right + " simbolo: " + val);
+	public Node myTree = new Node("INIT");
 
-                }
 
-                public String getTokenName(int id){
-                    String value = sym.terminalNames[id];
-                    switch(id) {
-                        case sym.ParentesisAbierto:
-                            return "(";
-                        case sym.ParentesisCerrado:
-                            return ")";
-                        case sym.Coma:
-                            return ",";
-                        case sym.AsignacionTipo:
-                            return ":";
-                        case sym.AsignacionVariable:
-                            return ":=";
-                        case sym.FinalInstruccion:
-                            return ";";
-                        case sym.For:
-                            return "for";
-						case sym.While:
-                            return "while";
-						case sym.Repeat:
-                            return "repeat";
-						case sym.If:
-                            return "if";
-						case sym.AsignacionIgual:
-                            return "=";	
-                        default:
-                            return value;  
-                    }
-                }
+	public Node getMyTree(){
+		return myTree;
+	}
+
+	public void report_error(String message, Object info) {
+		if (info instanceof Symbol) {
+			if (((Symbol)info).left != -1 && ((Symbol)info).right != -1) {
+				int line = (((Symbol)info).left)+1;
+				int column = (((Symbol)info).right)+1;
+				System.out.println(message + " " + " (line "+line+", column "+column+")");
+			}
+		}
+		System.err.println(message);
+	}
+	public void syntax_error(Symbol s){
+		String val = s.value != null ? s.value.toString() : getTokenName(s.sym);
+		//errors.add("Error sintactico en la linea: " + s.left +" columna: "+ s.right + " simbolo: " + val);
+		System.err.println("Error sintactico en la linea: " + s.left +" columna: "+ s.right + " simbolo: " + val);
+	}
+
+	public void unrecovered_syntax_error(Symbol s) {
+		if (s.left < 1 || s.left < 1) return;
+		String val = s.value != null ? s.value.toString() : getTokenName(s.sym);
+		//errors.add("Error sintactico en la linea: " + s.left +" columna: "+ s.right + " simbolo: " + val);
+		System.err.println("Error sintactico en la linea: " + s.left +" columna: "+ s.right + " simbolo: " + val);
+
+	}
+
+	public String getTokenName(int id){
+		String value = sym.terminalNames[id];
+		switch(id) {
+			case sym.ParentesisAbierto:
+				return "(";
+			case sym.ParentesisCerrado:
+				return ")";
+			case sym.Coma:
+				return ",";
+			case sym.AsignacionTipo:
+				return ":";
+			case sym.AsignacionVariable:
+				return ":=";
+			case sym.FinalInstruccion:
+				return ";";
+			case sym.For:
+				return "for";
+			case sym.While:
+				return "while";
+			case sym.Repeat:
+				return "repeat";
+			case sym.If:
+				return "if";
+			case sym.AsignacionIgual:
+				return "=";	
+			default:
+				return value;  
+		}
+	}
 :};
 
 terminal Begin, End, For, Function, If, To, Do, Else, Then, Until, While, Write, Read, 
 		Tipo, Not, Or, And, OpRel, OpSuma, OpMult, AsignacionVariable, AsignacionTipo, 
 		AsignacionIgual, FinalInstruccion, ParentesisAbierto, ParentesisCerrado, Coma, Punto, 
-		Variable, Constchar, Conststr, Program, Repeat, Procedure, Numero, StringPattern, Var,
+		Variable, Constchar, Conststr, Program, Repeat, Procedure, Numero, Var,
 		Record;
 
 non terminal program, identifier_list, declarations, subprogram_declaration, compound_statement, type,
@@ -77,232 +88,678 @@ non terminal program, identifier_list, declarations, subprogram_declaration, com
 		relation, extra_expression, final_instruccion_error, records, lista_record_values, char_declaration, 
 		integer_declaration, boolean_declaration;
 		
+// program //
+program ::=
+	Program Variable final_instruccion_error declarations subprogram_declarations compound_statement Punto
+		{:
 
-program ::= Program Variable final_instruccion_error declarations subprogram_declarations compound_statement Punto {: System.out.println("COMPILADO CON EXITO"); :}
-	| Program final_instruccion_error declarations subprogram_declarations compound_statement Punto {: System.out.println("COMPILADO CON EXITO"); :}
+			System.out.println("COMPILADO CON EXITO");
+			System.out.println(sym_table);
+
+		:}
+		|
+	Program final_instruccion_error declarations subprogram_declarations compound_statement Punto
+		{:
+			System.out.println("COMPILADO CON EXITO");
+			System.out.println(sym_table);
+
+		:}
 	;
+// \ program //
 
-identifier_list ::= Variable {:  :}
-	| identifier_list Coma Variable {:  :}
-	;
+// identifier_list //
+identifier_list ::=
+	Variable: v
+		{:
+			ArrayList ids = new ArrayList();
+			Token token = new Token(v.toString(), vright + 1, vleft + 1);
+			ids.add(token);
+			RESULT = ids;
+		:}
+		|
+	identifier_list: idl Coma Variable: v
+		{:
+			ArrayList ids = (ArrayList) idl;
+			Token token = new Token(v.toString(), vright + 1, vleft + 1);
+			ids.add(token);
+			RESULT = ids;
+		:}
+;
+// \ identifier_list //
 
-declarations ::= declarations Var identifier_list AsignacionTipo type FinalInstruccion {:  :}
-	| char_declaration {: :}
-	| integer_declaration {: :}
-	| boolean_declaration {: :}
-	| declarations Var identifier_list error type FinalInstruccion {: parser.report_error("Error en la asignacion de tipo", null); :}
-	| declarations records {: :}
-	| {:  :}
+// declarations //
+declarations ::=
+	declarations Var identifier_list: idl AsignacionTipo type: t FinalInstruccion
+		{:
+			ArrayList ids = ((ArrayList) idl);
+			for(int i = 0; i < ids.size(); i++) {
+				Token token = (Token)ids.get(i);
+				CustomType type = new CustomType(tright + 1, tleft + 1, t.toString());
+				Scope scope = new Scope(current_scope);
+				SymbolRow sr = new SymbolRow(token, type, scope, offset);
+				offset++;
+				sym_table.addSymbol(sr);
+			}
+		:}
+		|
+	char_declaration 
+		{:
+			 
+		:}
+		|
+	integer_declaration 
+		{:
+			 
+		:}
+		|
+	boolean_declaration 
+		{:
+			 
+		:}
+		|
+	declarations Var identifier_list error type FinalInstruccion 
+		{:
+			 parser.report_error("Error en la asignacion de tipo", null); 
+		:}
+		|
+	declarations records 
+		{:
+			 
+		:}
+		|			
+		{:
+			// Empty
+		:}
 	; 
+// \ declarations //
 
-char_declaration ::= declarations Var identifier_list AsignacionTipo type AsignacionIgual constant_character FinalInstruccion {: :}
+// char_declaration //
+char_declaration ::=
+	declarations Var identifier_list: idl AsignacionTipo type: t AsignacionIgual constant_character FinalInstruccion
+		{:
+			ArrayList ids = ((ArrayList) idl);
+			for(int i = 0; i < ids.size(); i++) {
+				Token token = (Token)ids.get(i);
+				CharacterType type = new CharacterType(tright + 1, tleft + 1);
+				Scope scope = new Scope(current_scope);
+				SymbolRow sr = new SymbolRow(token, type, scope, offset);
+				offset++;
+				sym_table.addSymbol(sr);
+			}
+		:}
 	;
+// \ char_declaration //
 
-integer_declaration ::= declarations Var identifier_list AsignacionTipo type AsignacionIgual Numero FinalInstruccion {: :}
+// integer_declaration //
+integer_declaration ::=
+	declarations Var identifier_list: idl AsignacionTipo type: t AsignacionIgual Numero FinalInstruccion
+		{:
+			ArrayList ids = ((ArrayList) idl);
+			for(int i = 0; i < ids.size(); i++) {
+				Token token = (Token)ids.get(i);
+				IntegerType type = new IntegerType(tright + 1, tleft + 1);
+				Scope scope = new Scope(current_scope);
+				SymbolRow sr = new SymbolRow(token, type, scope, offset);
+				offset++;
+				sym_table.addSymbol(sr);
+			}
+		:}
 	;
+// \ integer_declaration //
 
-boolean_declaration ::= declarations Var identifier_list AsignacionTipo type AsignacionIgual Variable FinalInstruccion {: :}
+// boolean_declaration //
+boolean_declaration ::=
+	declarations Var identifier_list: idl AsignacionTipo type: t AsignacionIgual Variable FinalInstruccion
+		{:
+			ArrayList ids = ((ArrayList) idl);
+			for(int i = 0; i < ids.size(); i++) {
+				Token token = (Token)ids.get(i);
+				BooleanType type = new BooleanType(tright + 1, tleft + 1);
+				Scope scope = new Scope(current_scope);
+				SymbolRow sr = new SymbolRow(token, type, scope, offset);
+				offset++;
+				sym_table.addSymbol(sr);
+			}
+			
+		:}
 	;
+// \ boolean_declaration //
 
-type ::= standard_type {:  :}
-	| {:  :}
+// type //
+type ::=
+	standard_type: t
+		{:
+			RESULT = t;
+		:}
+		|
+		{:
+			// Empty
+		:}
 	;
+// \ type //
 
-standard_type ::= Tipo {:  :}
+// standard_type //
+standard_type ::=
+	Tipo: t
+		{:
+			RESULT = t;
+		:}
 	;
+// \ standard_type //
 
-subprogram_declarations ::= subprogram_declarations subprogram_declaration final_instruccion_error {:  :}
-	| subprogram_declarations final_instruccion_error {: :}
-	| {:  :}
+// subprogram_declarations //
+subprogram_declarations ::=
+	subprogram_declarations subprogram_declaration final_instruccion_error
+		{:
+
+		:}
+		|
+	subprogram_declarations final_instruccion_error
+		{:
+
+		:}
+		|
+		{:
+			// Empty
+		:}
 	; 
+// \ subprogram_declarations //
 
-subprogram_declaration ::= subprogram_head declarations compound_statement {:  :}
+// subprogram_declaration //
+subprogram_declaration ::=
+	subprogram_head declarations
+		{:
+			// antes de que termine la ejecución de este bloque
+			System.out.println(sym_table);
+		:}
+	compound_statement
+		{:
+			
+		:}
 	;
+// \ subprogram_declaration //
 
-subprogram_head ::= Function Variable arguments AsignacionTipo standard_type final_instruccion_error {:  :}
-	| Function Variable arguments AsignacionTipo final_instruccion_error {: :}
-	| Procedure Variable arguments FinalInstruccion {:  :}
+// subprogram_head //
+subprogram_head ::=
+	Function Variable: v arguments AsignacionTipo standard_type final_instruccion_error
+		{:
+			current_scope.add(v);
+		:}
+		|
+	Function Variable: v arguments AsignacionTipo final_instruccion_error
+		{:
+			current_scope.add(v);
+		:}
+		|
+	Procedure Variable: v arguments FinalInstruccion
+		{:
+			current_scope.add(v);
+		:}
 	;
+// \ subprogram_head //
 
-arguments ::= ParentesisAbierto parameter_list ParentesisCerrado {:  :}
-	|
+// arguments //
+arguments ::=
+	ParentesisAbierto parameter_list ParentesisCerrado
+		{: 
+			
+		:}
+		|
+		{: 
+			// Empty
+		:}
 	;
+// \ arguments //
 
-parameter_list ::= identifier_list AsignacionTipo type {:  :}
-	| parameter_list FinalInstruccion identifier_list AsignacionTipo type {:  :}
+// parameter_list //
+parameter_list ::=
+	identifier_list AsignacionTipo type 
+		{:
+
+		:}
+		|
+	parameter_list FinalInstruccion identifier_list AsignacionTipo type 
+		{:
+
+		:}
 	;
+// \ parameter_list //
 
-compound_statement ::= Begin optional_statements End {:  :}
+// compound_statement //
+compound_statement ::=
+	Begin
+	optional_statements
+	End
+		{: 
+			/*
+			if(current_scope.size() > 0) {				
+				current_scope.remove(current_scope.size()-1);
+			}
+			*/
+		:}
 	;
+// \ compound_statement //
 
-optional_statements ::= statement_list:state_list {:
-		//System.out.println("LIST2: " + state_list);
-	:}
-	| {:  :} 
+// optional_statements //
+optional_statements ::=
+	statement_list:state_list
+		{:
+			//System.out.println("LIST2: " + state_list);
+		:}
+		|
+		{:
+			// Empty
+		:} 
 	;
+// \ optional_statements //
 
-statement_list ::= statement:state FinalInstruccion {: RESULT = state; :}
-	| error FinalInstruccion {: parser.report_error("Error en el statement", null); :}
-	| statement_list:state_list statement:state FinalInstruccion {: 
-		//System.out.println("LIST: " + state_list);
-		ArrayList n = new ArrayList();
+// statement_list //
+statement_list ::=
+	statement: state FinalInstruccion
+		{:
+			ArrayList n = new ArrayList();
+			
+			n.add(state);
+
+			RESULT = n;
+		:}
+		|
+	error FinalInstruccion
+		{:
+			parser.report_error("Error en el statement", null);
+		:}
+		|
+	statement_list: state_list statement:state FinalInstruccion
+		{: 
+			//System.out.println("LIST: " + state_list);
+			ArrayList n = new ArrayList();
+			
+			n.add(state);
+			n.addAll((ArrayList)state_list);
+
+			RESULT = n;
+		:}
+		|
+	statement_list error FinalInstruccion
+		{:
+			parser.report_error("Error en el statement", null);
+		:}
+	;
+// \ statement_list //
+
+// statement //
+statement ::=
+	variable: var AsignacionVariable expression: exp
+		{:
+			ExpressionNode p = new ExpressionNode("Expression", (ExpressionNode)var, (ExpressionNode)exp); 
+			myTree = p;
+			RESULT = p;
+		:}
+		|
+	procedure_statement
+		{:
+
+		:}
+		|
+	compound_statement
+		{:
+
+		:}
+		|
+	write_function
+		{:
+
+		:}
+		|
+	read_function
+		{:
+
+		:}
+		|
+	If expression Then statement: if_state Else statement: if_else_state
+		{: 
+			IfNode ifNode = new IfNode("If");
+			
+			/*ifNode.createBodyNode((ArrayList)if_state);         
+			ifNode.createElseNode((ArrayList)if_else_state);*/
+			
+			myTree = ifNode;
+			RESULT = ifNode;
+		:}
+		|
+	If error
+		{:
+			parser.report_error("Error en el If", null);
+		:}
+		|
+	While expression: exp Do statement: state
+		{: 
+			WhileNode whileNode = new WhileNode(new ExpressionNode("Expression", (ExpressionNode)exp), (Node)state);
+
+			myTree = whileNode;
+			RESULT = whileNode;
+		:}
+		|
+	While error
+		{:
+			parser.report_error("Error en el While", null);
+		:}
+		|
+	For Variable AsignacionVariable factor To expression: exp Do statement: state
+		{:  
+			ForNode forNode = new ForNode(new Node("Variable"), new Node("Factor"), new ExpressionNode("Expression", (ExpressionNode)exp), (Node)state);
+
+			myTree = forNode;
+			RESULT = forNode;
+		:}
+		|
+	For error
+		{:
+			parser.report_error("Error en el For", null);
+		:}
+		|
+	Repeat statement: state Until Variable AsignacionIgual expression: exp
+		{: 
+			RepeatNode repeatNode = new RepeatNode((Node)state, new Node("Variable"), new ExpressionNode("Expression", (ExpressionNode)exp));
 		
-		n.add(state);
-		n.addAll((ArrayList)state_list);
-
-		RESULT = n;
-	:}
-	| statement_list error FinalInstruccion {: parser.report_error("Error en el statement", null); :}
+			myTree = repeatNode;
+			RESULT = repeatNode;
+		:}
+		|
+	Repeat error
+		{:
+			parser.report_error("Error en el Repeat", null);
+		:}
 	;
+// \ statement //
 
-statement ::= variable:var AsignacionVariable expression:exp {: ExpressionNode p = new ExpressionNode("Expression", (ExpressionNode)var, (ExpressionNode)exp); 
-		myTree = p;
-		RESULT = p;
-	:}
-	| procedure_statement {:  :}
-	| compound_statement {:  :}
-	| write_function {:  :}
-	| read_function {:  :}
-	| If expression Then statement:if_state Else statement:if_else_state {: 
-		IfNode ifNode = new IfNode("If");
-	 	
-		/*ifNode.createBodyNode((ArrayList)if_state);         
-        ifNode.createElseNode((ArrayList)if_else_state);*/
-        
-		myTree = ifNode;
-		RESULT = ifNode;
-	:}
-	| If error {: parser.report_error("Error en el If", null); :}
-	| While expression:exp Do statement:state {: 
-		WhileNode whileNode = new WhileNode(new ExpressionNode("Expression", (ExpressionNode)exp), (Node)state);
+// write_function //
+write_function ::=
+	Write ParentesisAbierto constant_string Coma Variable ParentesisCerrado
+		{:
 
-		myTree = whileNode;
-		RESULT = whileNode;
-	:}
-	| While error {: parser.report_error("Error en el While", null); :}
-	| For Variable AsignacionVariable factor To expression:exp Do statement:state {:  
-		ForNode forNode = new ForNode(new Node("Variable"), new Node("Factor"), new ExpressionNode("Expression", (ExpressionNode)exp), (Node)state);
+		:}
+		|
+	Write ParentesisAbierto constant_string ParentesisCerrado
+		{:
 
-		myTree = forNode;
-		RESULT = forNode;
-	:}
-	| For error {: parser.report_error("Error en el For", null); :}
-	| Repeat statement:state Until Variable AsignacionIgual expression:exp {: 
-		RepeatNode repeatNode = new RepeatNode((Node)state, new Node("Variable"), new ExpressionNode("Expression", (ExpressionNode)exp));
-	
-		myTree = repeatNode;
-		RESULT = repeatNode;
-	 :}
-	| Repeat error {: parser.report_error("Error en el Repeat", null); :}
+		:}
 	;
+// \ write_function //
 
-write_function ::= Write ParentesisAbierto constant_string Coma Variable ParentesisCerrado {:  :}
-	| Write ParentesisAbierto constant_string ParentesisCerrado {: :}
+// read_function //
+read_function ::=
+	Read ParentesisAbierto Variable ParentesisCerrado
+		{:
+
+		:}
 	;
+// \ read_function //
 
-read_function ::= Read ParentesisAbierto Variable ParentesisCerrado {:  :}
+// variable //
+variable ::=
+	Variable tail
+		{:
+
+		:}
 	;
+// \ variable //
 
-variable ::= Variable tail {:  :}
+// tail //
+tail ::=
+	expression tail
+		{:
+
+		:}
+		| 
+		{:
+			// Empty
+		:}
 	;
+// \ tail //
 
-tail ::= expression tail {:  :}
-	| {:  :}
+// procedure_statement //
+procedure_statement ::=
+	Variable
+		{:
+
+		:}
+		|
+	Variable ParentesisAbierto expression_list ParentesisCerrado
+		{:
+
+		:}
 	;
+// \ procedure_statement //
 
-procedure_statement ::= Variable {:  :}
-	| Variable ParentesisAbierto expression_list ParentesisCerrado {:  :}
+// expression_list //
+expression_list ::=
+	expression: exp extra_expression: ex_exp
+		{:
+			ExpressionNode p = new ExpressionNode("Expression", (ExpressionNode)exp, (ExpressionNode)ex_exp); 
+			myTree = p;
+			RESULT = p;
+		:}
 	;
+// \ expression_list //
 
-expression_list ::= expression:exp extra_expression:ex_exp {: ExpressionNode p = new ExpressionNode("Expression", (ExpressionNode)exp, (ExpressionNode)ex_exp); 
-		myTree = p;
-		RESULT = p;
-	:}
+// expression //
+expression ::=
+	expression: exp And: and relation: rel
+		{:
+			ExpressionNode p = new ExpressionNode("Expression", (ExpressionNode)exp, new Node("and"), (ExpressionNode)rel); 
+			myTree = p;
+			RESULT = p;
+		:}
+		|
+	expression: exp Or: or relation: rel
+		{:
+			ExpressionNode p = new ExpressionNode("Expression", (ExpressionNode)exp, new Node("or"), (ExpressionNode)rel);
+			myTree = p;
+			RESULT = p; 
+		:}
+		|
+	relation: rel
+		{:
+			RESULT = rel;
+		:}
+		|
+	error
+		{:
+			parser.report_error("Error en la expresion", null);
+		:}
 	;
+// \ expression //
 
-expression ::= expression:exp And:and relation:rel {: ExpressionNode p = new ExpressionNode("Expression", (ExpressionNode)exp, new Node("and"), (ExpressionNode)rel); 
-		myTree = p;
-		RESULT = p;
-	:}
-    | expression:exp Or:or relation:rel {: ExpressionNode p = new ExpressionNode("Expression", (ExpressionNode)exp, new Node("or"), (ExpressionNode)rel);
-		myTree = p;
-		RESULT = p; 
-	:}
-    | relation:rel {: RESULT = rel; :}
-	| error {: parser.report_error("Error en la expresion", null); :}
+// extra_expression //
+extra_expression ::=
+	Coma expression: exp extra_expression: ex_exp
+		{:
+			ExpressionNode p = new ExpressionNode("Expression", (ExpressionNode)exp, (ExpressionNode)ex_exp); 
+			myTree = p;
+			RESULT = p;
+		:}
+		|
+		{:
+			// Empty
+		:}
+	;
+// \ extra_expression //
+
+// relation //
+relation ::=
+	simple_expression: simp_exp
+		{:
+			RESULT = simp_exp;
+		:}
+		|
+	simple_expression: simp_exp OpRel: oprel simple_expression: simp_exp2
+		{:
+			ExpressionNode p = new ExpressionNode("Expression", (ExpressionNode)simp_exp, new Node("Operador Relacional"), (ExpressionNode)simp_exp2); 
+			myTree = p;
+			RESULT = p;
+		:}
+		|
+	simple_expression: simp_exp AsignacionIgual: asignacion_igual simple_expression: simp_exp2
+		{:
+			ExpressionNode p = new ExpressionNode("Expression", (ExpressionNode)simp_exp, new Node("Asignacion Igual"), (ExpressionNode)simp_exp2); 
+			myTree = p;
+			RESULT = p;
+		:}
+	;
+// \ relation //
+
+// simple_expression //
+simple_expression ::=
+	simple_expression: simp_exp OpSuma: opsuma mult_expression: mult_exp
+		{:
+			ExpressionNode p = new ExpressionNode("Expression", (ExpressionNode)simp_exp, new Node("Operador Suma"), (ExpressionNode)mult_exp); 
+			myTree = p;
+			RESULT = p;
+		:}
+		|
+	mult_expression: mult_exp
+		{:
+			RESULT = mult_exp;
+		:}
+	;
+// \ simple_expression //
+
+// mult_expression //
+mult_expression ::=
+	mult_expression: mult_exp OpMult: opmult factor: fac
+		{:
+			ExpressionNode p = new ExpressionNode("Expression", (ExpressionNode)mult_exp, new Node("Operador Multiplicacion"), new Node("Factor")); 
+			myTree = p;
+			RESULT = p;
+		:}
+		|
+	factor: fac
+		{:
+			RESULT = fac;
+		:}
+	;
+// \ mult_expression //
+
+// factor //
+factor ::=
+	Numero: numero
+		{:
+			Node n = new Node("Numero");
+			n.setValue("Integer");
+			ExpressionNode p = new ExpressionNode("Expression" , n);
+			RESULT = p;
+		:}
+		|
+	Variable: var
+		{:	
+			Node n = new Node("Variable");
+			n.setValue("Variable");
+			ExpressionNode p = new ExpressionNode("Expression", n);
+			RESULT = p;
+		:}
+		|
+	Not: not factor: fac
+		{:
+			Node n = new Node("Not");
+			n.setValue("Not");
+			ExpressionNode p = new ExpressionNode("Expression" , n, new Node("Factor"));
+			RESULT = p; 
+		:}
+		|
+	constant: cons
+		{:
+			RESULT = cons;
+		:}
+		|
+	ParentesisAbierto expression_list: exp_list ParentesisCerrado
+		{:
+			ExpressionNode p = new ExpressionNode("Expression", (ExpressionNode)exp_list); 
+			myTree = p;
+			RESULT = p; 
+		:}
+	;
+// \ factor //
+
+// constant //
+constant ::=
+	constant_character: cc
+		{:
+			RESULT = cc;
+		:}
+		|
+	constant_string: cs
+		{:
+			RESULT = cs;
+		:}
+	;
+// \ constant //
+
+// constant_character //
+constant_character ::=
+	Constchar: c
+		{:
+			RESULT = c;
+		:}
+	;
+// \ constant_character //
+
+// constant_string //
+constant_string ::=
+	Conststr: c
+		{:
+			RESULT = c;
+		:}
+	;
+// \ constant_string //
+
+// final_instruccion_error //
+final_instruccion_error ::=
+	FinalInstruccion
+		{:
+
+		:}
+		|
+	error
+		{:
+			parser.report_error("Falta final de instruccion", null);
+		:}
     ;
+// \ final_instruccion_error //
 
-extra_expression ::= Coma expression:exp extra_expression:ex_exp {: ExpressionNode p = new ExpressionNode("Expression", (ExpressionNode)exp, (ExpressionNode)ex_exp); 
-		myTree = p;
-		RESULT = p;
-	:}
-	| {:  :}
+// records //
+records ::=
+	Var Variable: v AsignacionIgual Record lista_record_values:lvr End
+		{: 
+			ArrayList<Record_Attribute> attributes = (ArrayList<Record_Attribute> ) lvr;
+			Token token = new Token(v, vright + 1, vleft + 1);
+			RecordType type = new RecordType(token, attributes, vright + 1, vleft + 1);
+			Scope scope = new Scope(current_scope);
+			SymbolRow sr = new SymbolRow(token, type, scope, offset);
+			offset++;
+			sym_table.addSymbol(sr);
+		 :}
 	;
+// \ records //
 
-relation ::= simple_expression:simp_exp {: RESULT = simp_exp; :}
-    | simple_expression:simp_exp OpRel:oprel simple_expression:simp_exp2 {: ExpressionNode p = new ExpressionNode("Expression", (ExpressionNode)simp_exp, new Node("Operador Relacional"), (ExpressionNode)simp_exp2); 
-		myTree = p;
-		RESULT = p;
-	:}
-	| simple_expression:simp_exp AsignacionIgual:asignacion_igual simple_expression:simp_exp2 {: ExpressionNode p = new ExpressionNode("Expression", (ExpressionNode)simp_exp, new Node("Asignacion Igual"), (ExpressionNode)simp_exp2); 
-		myTree = p;
-		RESULT = p;
-	:}
-    ;
-
-simple_expression ::= simple_expression:simp_exp OpSuma:opsuma mult_expression:mult_exp {: ExpressionNode p = new ExpressionNode("Expression", (ExpressionNode)simp_exp, new Node("Operador Suma"), (ExpressionNode)mult_exp); 
-		myTree = p;
-		RESULT = p;
-	:}
-	| mult_expression:mult_exp {: RESULT = mult_exp; :}
+// lista_record_values //
+lista_record_values ::=
+	Variable: v AsignacionTipo Tipo: t FinalInstruccion lista_record_values: lrv
+		{:
+			ArrayList<Record_Attribute> attributes;
+			if(lrv instanceof ArrayList) {
+				attributes = (ArrayList<Record_Attribute> ) lrv;
+			}
+			attributes = new ArrayList();
+			Token token = new Token(v, vright + 1, vleft + 1);
+			CustomType  type = new CustomType(vright + 1, vleft + 1, t.toString());
+			Record_Attribute attribute = new Record_Attribute(token, type);
+			attributes.add(attribute);
+			RESULT = attributes;
+		:}
+		|
+		{:
+			// Empty	
+		:}
 	;
-
-mult_expression ::= mult_expression:mult_exp OpMult:opmult factor:fac {: ExpressionNode p = new ExpressionNode("Expression", (ExpressionNode)mult_exp, new Node("Operador Multiplicacion"), new Node("Factor")); 
-		myTree = p;
-		RESULT = p;
-	:}
-	| factor:fac {: RESULT = fac; :}
-	;
-
-factor ::= Numero:numero {: Node n = new Node("Numero");
-        n.setValue("Integer");
-        ExpressionNode p = new ExpressionNode("Expression" , n);
-        RESULT = p;
-	:}
-	| Variable:var {: Node n = new Node("Variable");
-		n.setValue("Variable");
-		ExpressionNode p = new ExpressionNode("Expression", n);
-		RESULT = p;
-	:}
-	| Not:not factor:fac {: Node n = new Node("Not");
-        n.setValue("Not");
-        ExpressionNode p = new ExpressionNode("Expression" , n, new Node("Factor"));
-        RESULT = p; 
-	:}
-	| constant:cons {: RESULT = cons; :}
-	| ParentesisAbierto expression_list:exp_list ParentesisCerrado {: ExpressionNode p = new ExpressionNode("Expression", (ExpressionNode)exp_list); 
-		myTree = p;
-		RESULT = p; 
-	:}
-	;
-
-constant ::= constant_character {:  :}
-	| constant_string {:  :}
-	;
-
-constant_character ::= Constchar {:  :}
-	;
-
-constant_string ::= Conststr {:  :}
-	;
-
-final_instruccion_error ::= FinalInstruccion {:  :}
-    | error {: parser.report_error("Falta final de instruccion", null); :}
-    ;
-
-records ::= Var Variable AsignacionIgual Record lista_record_values End  {:  :}
-	;
-
-lista_record_values ::= Variable AsignacionTipo Tipo FinalInstruccion lista_record_values {:  :}
-	| {: :}
-	;
+// \ lista_record_values //

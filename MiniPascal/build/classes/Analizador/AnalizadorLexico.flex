@@ -14,7 +14,6 @@ import java_cup.runtime.*;
 //DEFINICIONES UTILES
 Digito=[0-9]
 Numero={Digito}({Digito})*
-NegativeInteger="-"+{Numero}
 Caracter=[a-z]|[A-Z]
 
 //PALABRAS RESERVADAS
@@ -65,9 +64,6 @@ Punto="."
 //ID
 Variable={Caracter}({Digito}|{Caracter})*
 
-//STRING
-StringPattern=[\"]([^\"]+)*[\"]
-
 //CONSTANTS
 Constchar=([\']([^'])[\'])|''
 Conststr=[\']([^']+)*[\']
@@ -81,7 +77,6 @@ WhiteSpace=[\ \n\r\t\f]
 %%
 
 <YYINITIAL> {
-    {StringPattern} {return new Symbol(sym.StringPattern, 0, 0, yytext());}
     {Constchar} {return new Symbol(sym.Constchar, yyline, yycolumn, yytext());}
     {Conststr} {return new Symbol(sym.Conststr, yyline, yycolumn, yytext());}
 

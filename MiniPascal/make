@@ -1,10 +1,10 @@
   clear
 
-   cd src/Analyzer
+   cd src/Analizador
 
-  if [ ! -f ./Lexical.jflex ]; then
+  if [ ! -f ./AnalizadorLexico.flex ]; then
 
-    echo The source file Lexical.jflex does not exist.
+    echo The source file AnalizadorLexico.flex does not exist.
     exit
 
   fi
@@ -12,32 +12,32 @@
   echo Compiling... 
   echo
 
-  if [ -f ./Lexical.java ]; then
+  if [ -f ./AnalizadorLexico.java ]; then
   
     set -e
-    echo Remove Lexical.java
+    echo Remove AnalizadorLexico.java
     echo
-    rm Lexical.java
+    rm AnalizadorLexico.java
 
   fi
 
-  if [ -f ./Lexical.java~ ]; then
+  if [ -f ./AnalizadorLexico.java~ ]; then
 
-    echo Remove Lexical.java~
+    echo Remove AnalizadorLexico.java~
     echo
-    rm Lexical.java~
+    rm AnalizadorLexico.java~
   fi
 
-  echo Compile Lexical.jflex
+  echo Compile AnalizadorLexico.flex
   echo
-  jflex Lexical.jflex
-  echo
-
-  echo Compile Syntactical.cup
-  echo
-  cup -parser Syntactical -symbols CompilerSymbol Syntactical.cup
+  jflex AnalizadorLexico.flex
   echo
 
+
+  echo Compile parser.cup
+  echo
+  java -jar ../../java-cup-11b.jar parser.cup
+  echo
 
   echo All Compiled!
 
