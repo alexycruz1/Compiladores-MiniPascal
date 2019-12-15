@@ -1,6 +1,7 @@
 package Analizador;
 import java_cup.runtime.*;
 import org.json.simple.*;
+import com.google.gson.*;
 import java.util.ArrayList;
 import Arbol.*;
 import Table.*;
@@ -20,8 +21,12 @@ parser code {:
 	public Node myTree = new Node("INIT");
 
 
-	public Node getMyTree(){
-		return myTree;
+	public void printTree(JSONObject obj){
+		Gson gson = new GsonBuilder().setPrettyPrinting().create();
+		JsonParser jp = new JsonParser();
+		JsonElement je = jp.parse(obj.toString());
+		String prettyJsonString = gson.toJson(je);
+		System.out.println(prettyJsonString);
 	}
 
 	public void backScope() {		
@@ -100,11 +105,11 @@ non terminal program, identifier_list, declarations, subprogram_declaration, com
 		
 // program //
 program ::=
-	Program Variable: v
+	Program: p Variable: v
 		{:
 			current_scope.add(v);
 		:}
-	final_instruccion_error declarations subprogram_declarations compound_statement Punto
+	final_instruccion_error declarations: d subprogram_declarations: sd compound_statement: cs Punto: punto
 		{:
 			if(errors.size() == 0) {
 				System.out.println("COMPILADO CON EXITO");				
@@ -114,17 +119,26 @@ program ::=
 				}
 				System.out.println("\t\t--- COMPILACIÓN FALLIDA ---");
 			}
-
-			//backScope();
 			
-			System.out.println(sym_table);
+			//System.out.println(sym_table);
+
+			JSONObject myJson = new JSONObject();
+			myJson.put("Program", p.toString());
+			myJson.put("Variable", v.toString());
+			myJson.put("declarations", (JSONObject) d);
+			myJson.put("subprogram_declarations", (JSONObject) sd);
+			myJson.put("compound_statement", (JSONObject) cs);
+			myJson.put("Punto", punto.toString());
+
+			printTree(myJson);
+			RESULT = myJson;
 		:}
 		|
-	Program 
+	Program: p
 		{:
 			current_scope.add("ROOT");
 		:}
-	final_instruccion_error declarations subprogram_declarations compound_statement Punto
+	final_instruccion_error declarations: d subprogram_declarations: sd compound_statement: cs Punto: punto
 		{:
 			if(errors.size() == 0) {
 				System.out.println("COMPILADO CON EXITO");				
@@ -135,9 +149,17 @@ program ::=
 				System.out.println("\t\t--- COMPILACIÓN FALLIDA ---");
 			}
 
-			//backScope();
+			//System.out.println(sym_table);
 
-			System.out.println(sym_table);
+			JSONObject myJson = new JSONObject();
+			myJson.put("Program", p.toString());
+			myJson.put("declarations", (JSONObject) d);
+			myJson.put("subprogram_declarations", (JSONObject) sd);
+			myJson.put("compound_statement", (JSONObject) cs);
+			myJson.put("Punto", punto.toString());
+
+			printTree(myJson);
+			RESULT = myJson;
 		:}
 	;
 // \ program //
@@ -164,7 +186,7 @@ identifier_list ::=
 
 // declarations //
 declarations ::=
-	declarations Var identifier_list: idl AsignacionTipo type: t FinalInstruccion
+	declarations: d Var: var identifier_list: idl AsignacionTipo: at type: t FinalInstruccion: fi
 		{:
 			
 			ArrayList ids = ((ArrayList) idl);
@@ -176,21 +198,40 @@ declarations ::=
 				offset++;
 				sym_table.addSymbol(sr);
 			}
+
+			JSONObject myJson = new JSONObject();
+			myJson.put("declarations", (JSONObject) d);
+			myJson.put("Var", var.toString());
+			JSONArray id_list = new JSONArray();
+			for(Object value : (ArrayList) idl) {
+				id_list.add(((Token)value).valex);		
+			}				
+			myJson.put("identifier_list", id_list);
+			myJson.put("AsignacionTipo", at.toString());
+			myJson.put("type", t.toString());
+			myJson.put("FinalInstruccion", fi.toString());
+			RESULT = myJson;
 		:}
 		|
-	char_declaration 
+	char_declaration: d
 		{:
-			 
+			JSONObject myJson = new JSONObject();
+			myJson.put("char_declaration", (JSONObject) d);
+			RESULT = myJson;
 		:}
 		|
-	integer_declaration 
+	integer_declaration: d
 		{:
-			 
+			JSONObject myJson = new JSONObject();
+			myJson.put("integer_declaration", (JSONObject) d);
+			RESULT = myJson;
 		:}
 		|
-	boolean_declaration 
+	boolean_declaration: d
 		{:
-			 
+			JSONObject myJson = new JSONObject();
+			myJson.put("boolean_declaration", (JSONObject) d);
+			RESULT = myJson;
 		:}
 		|
 	declarations Var identifier_list error type FinalInstruccion 
@@ -198,9 +239,12 @@ declarations ::=
 			 parser.report_error("Error en la asignacion de tipo", null); 
 		:}
 		|
-	declarations records 
+	declarations: d records: r
 		{:
-			 
+			JSONObject myJson = new JSONObject();
+			myJson.put("declarations", (JSONObject) d);
+			myJson.put("records", (JSONObject) r);
+			RESULT = myJson;
 		:}
 		|			
 		{:
@@ -211,7 +255,7 @@ declarations ::=
 
 // char_declaration //
 char_declaration ::=
-	declarations Var identifier_list: idl AsignacionTipo type: t AsignacionIgual constant_character FinalInstruccion
+	declarations:d Var: var identifier_list: idl AsignacionTipo: at type: t AsignacionIgual: ai constant_character: cc FinalInstruccion: fi
 		{:
 			ArrayList ids = ((ArrayList) idl);
 			for(int i = 0; i < ids.size(); i++) {
@@ -222,13 +266,28 @@ char_declaration ::=
 				offset++;
 				sym_table.addSymbol(sr);
 			}
+
+			JSONObject myJson = new JSONObject();
+			myJson.put("declarations", (JSONObject) d);
+			myJson.put("Var", var.toString());
+			JSONArray id_list = new JSONArray();
+			for(Object value : (ArrayList) idl) {
+				id_list.add(((Token)value).valex);		
+			}				
+			myJson.put("identifier_list", id_list);
+			myJson.put("AsignacionTipo", at.toString());
+			myJson.put("type", t.toString());
+			myJson.put("AsignacionIgual", ai.toString());
+			myJson.put("constant_character", cc.toString());
+			myJson.put("FinalInstruccion", fi.toString());
+			RESULT = myJson;
 		:}
 	;
 // \ char_declaration //
 
 // integer_declaration //
 integer_declaration ::=
-	declarations Var identifier_list: idl AsignacionTipo type: t AsignacionIgual Numero FinalInstruccion
+	declarations: d Var: var identifier_list: idl AsignacionTipo: at type: t AsignacionIgual: ai Numero: n FinalInstruccion:fi
 		{:
 			ArrayList ids = ((ArrayList) idl);
 			for(int i = 0; i < ids.size(); i++) {
@@ -239,13 +298,28 @@ integer_declaration ::=
 				offset++;
 				sym_table.addSymbol(sr);
 			}
+
+			JSONObject myJson = new JSONObject();
+			myJson.put("declarations", (JSONObject) d);
+			myJson.put("Var", var.toString());
+			JSONArray id_list = new JSONArray();
+			for(Object value : (ArrayList) idl) {
+				id_list.add(((Token)value).valex);		
+			}				
+			myJson.put("identifier_list", id_list);
+			myJson.put("AsignacionTipo", at.toString());
+			myJson.put("type", t.toString());
+			myJson.put("AsignacionIgual", ai.toString());
+			myJson.put("Numero", n.toString());
+			myJson.put("FinalInstruccion", fi.toString());
+			RESULT = myJson;
 		:}
 	;
 // \ integer_declaration //
 
 // boolean_declaration //
 boolean_declaration ::=
-	declarations Var identifier_list: idl AsignacionTipo type: t AsignacionIgual Variable FinalInstruccion
+	declarations: d Var: var identifier_list: idl AsignacionTipo: at type: t AsignacionIgual: ai Variable: v FinalInstruccion: fi
 		{:
 			ArrayList ids = ((ArrayList) idl);
 			for(int i = 0; i < ids.size(); i++) {
@@ -256,6 +330,21 @@ boolean_declaration ::=
 				offset++;
 				sym_table.addSymbol(sr);
 			}
+
+			JSONObject myJson = new JSONObject();
+			myJson.put("declarations", (JSONObject) d);
+			myJson.put("Var", var.toString());
+			JSONArray id_list = new JSONArray();
+			for(Object value : (ArrayList) idl) {
+				id_list.add(((Token)value).valex);		
+			}				
+			myJson.put("identifier_list", id_list);
+			myJson.put("AsignacionTipo", at.toString());
+			myJson.put("type", t.toString());
+			myJson.put("AsignacionIgual", ai.toString());
+			myJson.put("Variable", v.toString());
+			myJson.put("FinalInstruccion", fi.toString());
+			RESULT = myJson;
 			
 		:}
 	;
@@ -285,14 +374,19 @@ standard_type ::=
 
 // subprogram_declarations //
 subprogram_declarations ::=
-	subprogram_declarations subprogram_declaration final_instruccion_error
+	subprogram_declarations: sds subprogram_declaration: sd final_instruccion_error
 		{:
-			
+			JSONObject myJson = new JSONObject();
+			myJson.put("subprogram_declaration", (JSONObject) sd);		
+			myJson.put("subprogram_declarations", (JSONObject) sds);
+			RESULT = myJson;
 		:}
 		|
-		subprogram_declarations final_instruccion_error
+		subprogram_declarations:sds final_instruccion_error
 		{:
-			
+			JSONObject myJson = new JSONObject();
+			myJson.put("subprogram_declarations", (JSONObject) sds);		
+			RESULT = myJson;
 		:}
 		|
 		{:			
@@ -303,16 +397,22 @@ subprogram_declarations ::=
 
 // subprogram_declaration //
 subprogram_declaration ::=
-	subprogram_head declarations compound_statement	
+	subprogram_head: sh declarations: d compound_statement: cs
 		{:
 			backScope();
+
+			JSONObject myJson = new JSONObject();
+			myJson.put("subprogram_head", (JSONObject) sh);
+			myJson.put("declarations", (JSONObject) d);			
+			myJson.put("compound_statement", (JSONObject) cs);
+			RESULT = myJson;
 		:}
 	;
 // \ subprogram_declaration //
 
 // subprogram_head //
 subprogram_head ::=
-	Function:p Variable: v arguments AsignacionTipo: t standard_type final_instruccion_error
+	Function: p Variable: v arguments: a AsignacionTipo: at standard_type: t final_instruccion_error
 		{:
 			Token token = new Token(v, vright + 1, vleft + 1);
 			CustomType type = new CustomType(pright + 1, pleft + 1, p.toString());
@@ -322,9 +422,17 @@ subprogram_head ::=
 			sym_table.addSymbol(sr);
 
 			current_scope.add(v);
+
+			JSONObject myJson = new JSONObject();
+			myJson.put("Function", p.toString());
+			myJson.put("Variable", v.toString());
+			myJson.put("arguments", (JSONObject) a);
+			myJson.put("AsignacionTipo", at.toString());
+			myJson.put("standard_type", t.toString());
+			RESULT = myJson;
 		:}
 		|
-	Function: p Variable: v arguments AsignacionTipo: t final_instruccion_error
+	Function: p Variable: v arguments: a AsignacionTipo: at final_instruccion_error
 		{:
 			Token token = new Token(v, vright + 1, vleft + 1);
 			CustomType type = new CustomType(pright + 1, pleft + 1, p.toString());
@@ -334,9 +442,16 @@ subprogram_head ::=
 			sym_table.addSymbol(sr);
 
 			current_scope.add(v);
+
+			JSONObject myJson = new JSONObject();
+			myJson.put("Function", p.toString());
+			myJson.put("Variable", v.toString());
+			myJson.put("arguments", (JSONObject) a);
+			myJson.put("AsignacionTipo", at.toString());
+			RESULT = myJson;
 		:}
 		|
-	Procedure: p Variable: v arguments FinalInstruccion
+	Procedure: p Variable: v arguments: a FinalInstruccion: fi
 		{:
 			Token token = new Token(v, vright + 1, vleft + 1);
 			CustomType type = new CustomType(pright + 1, pleft + 1, p.toString());
@@ -346,15 +461,26 @@ subprogram_head ::=
 			sym_table.addSymbol(sr);
 
 			current_scope.add(v);
+
+			JSONObject myJson = new JSONObject();
+			myJson.put("Procedure", p.toString());
+			myJson.put("Variable", v.toString());
+			myJson.put("arguments", (JSONObject) a);
+			myJson.put("FinalInstruccion", fi.toString());
+			RESULT = myJson;
 		:}
 	;
 // \ subprogram_head //
 
 // arguments //
 arguments ::=
-	ParentesisAbierto parameter_list ParentesisCerrado
+	ParentesisAbierto: pa parameter_list: pl ParentesisCerrado: pc
 		{:
-			
+			JSONObject myJson = new JSONObject();
+			myJson.put("ParentesisAbierto", pa.toString());
+			myJson.put("parameter_list", (JSONObject) pl);
+			myJson.put("ParentesisCerrado", pc.toString());
+			RESULT = myJson;
 		:}
 		|
 		{:
@@ -365,14 +491,32 @@ arguments ::=
 
 // parameter_list //
 parameter_list ::=
-	identifier_list AsignacionTipo type 
+	identifier_list: il AsignacionTipo: at type: t 
 		{:
-
+			JSONObject myJson = new JSONObject();
+			JSONArray id_list = new JSONArray();
+			for(Object value : (ArrayList) il) {
+				id_list.add(((Token)value).valex);		
+			}				
+			myJson.put("identifier_list", id_list);
+			myJson.put("AsignacionTipo", at.toString());
+			myJson.put("type", t.toString());
+			RESULT = myJson;
 		:}
 		|
-	parameter_list FinalInstruccion identifier_list AsignacionTipo type 
+	parameter_list: pl FinalInstruccion: fi identifier_list: il AsignacionTipo: at type: t
 		{:
-
+			JSONObject myJson = new JSONObject();
+			myJson.put("parameter_list", (JSONObject) pl);
+			myJson.put("FinalInstruccion", fi.toString());
+			JSONArray id_list = new JSONArray();
+			for(Object value : (ArrayList) il) {
+				id_list.add(((Token)value).valex);		
+			}				
+			myJson.put("identifier_list", id_list);
+			myJson.put("AsignacionTipo", at.toString());
+			myJson.put("type", t.toString());
+			RESULT = myJson;
 		:}
 	;
 // \ parameter_list //
@@ -498,12 +642,12 @@ statement ::=
 			parser.report_error("Error en el If", null);
 		:}
 		|
-	While: w expression: exp Do: do statement: state
+	While: w expression: exp Do: d statement: state
 		{:
 			JSONObject myJson = new JSONObject();
 			myJson.put("While", w.toString());
 			myJson.put("expression", (JSONObject) exp);
-			myJson.put("Do", do.toString());
+			myJson.put("Do", d.toString());
 			myJson.put("statement", (JSONObject) state);
 			RESULT = myJson;			
 		:}
@@ -513,16 +657,16 @@ statement ::=
 			parser.report_error("Error en el While", null);
 		:}
 		|
-	For: f Variable: v AsignacionVariable: av factor: f To: to expression: exp Do: do statement: state
+	For: f Variable: v AsignacionVariable: av factor: fac To: to expression: exp Do: d statement: state
 		{:
 			JSONObject myJson = new JSONObject();
 			myJson.put("For", f.toString());
 			myJson.put("Variable", v.toString());
 			myJson.put("AsignacionVariable", av.toString());
-			myJson.put("factor", (JSONObject) f);
+			myJson.put("factor", (JSONObject) fac);
 			myJson.put("To", to.toString());
 			myJson.put("expression", (JSONObject) exp);
-			myJson.put("Do", do.toString());
+			myJson.put("Do", d.toString());
 			myJson.put("statement", (JSONObject) state);
 			RESULT = myJson;
 		:}
@@ -558,14 +702,14 @@ write_function ::=
 			JSONObject myJson = new JSONObject();
 			myJson.put("Write", w.toString());
 			myJson.put("ParentesisAbierto", pa.toString());
-			myJson.put("constant_string", (JSONObject) cs);
+			myJson.put("constant_string", cs.toString());
 			myJson.put("Coma", coma.toString());
 			myJson.put("Variable", v.toString());
 			myJson.put("ParentesisCerrado", pc.toString());
 			RESULT = myJson;
 		:}
 		|
-	Write: w ParentesisAbierto: pc constant_string: cs ParentesisCerrado: pc
+	Write: w ParentesisAbierto: pa constant_string: cs ParentesisCerrado: pc
 		{:
 			JSONObject myJson = new JSONObject();
 			myJson.put("Write", w.toString());

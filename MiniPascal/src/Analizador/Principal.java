@@ -89,10 +89,6 @@ public class Principal extends javax.swing.JFrame {
             parser parser = new parser(scanner);
             parser.parse();
 
-            Node tree = parser.getMyTree();
-            tree.showTree("");
-            tree.getType();
-
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -111,7 +107,7 @@ public class Principal extends javax.swing.JFrame {
          */
         try {
             for (javax.swing.UIManager.LookAndFeelInfo info : javax.swing.UIManager.getInstalledLookAndFeels()) {
-                if ("Nimbus".equals(info.getName())) {
+                if ("Windows".equals(info.getName())) {
                     javax.swing.UIManager.setLookAndFeel(info.getClassName());
                     break;
                 }
