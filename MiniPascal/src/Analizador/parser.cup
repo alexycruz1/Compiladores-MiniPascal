@@ -194,7 +194,7 @@ declarations ::=
 			ArrayList ids = ((ArrayList) idl);
 			for(int i = 0; i < ids.size(); i++) {
 				Token token = (Token)ids.get(i);
-				CustomType type = new CustomType(tright + 1, tleft + 1, .toUpperCase());
+				CustomType type = new CustomType(tright + 1, tleft + 1, t.toString().toUpperCase());
 				Scope scope = new Scope(current_scope.clone());
 				SymbolRow sr = new SymbolRow(token, type, scope, offset);
 				offset++;
