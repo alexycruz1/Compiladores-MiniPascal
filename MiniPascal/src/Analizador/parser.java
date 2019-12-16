@@ -1123,6 +1123,50 @@ class CUP$parser$actions {
 
 			current_scope.add(v);
 
+			// ASSING PARAMS
+
+			boolean flag = true;
+			JSONObject j_arguments = (JSONObject) a;
+			JSONObject j_parameter_list = (JSONObject) j_arguments.get("parameter_list");			
+			
+			JSONArray j_identifier_list = (JSONArray) j_parameter_list.get("identifier_list");			
+			
+			String j_type = j_parameter_list.get("type").toString();			
+
+			for(Object value : j_identifier_list) {
+				Token token1 = new Token( value.toString(), 0, 0);
+				CustomType type1 = new CustomType(tright + 1, tleft + 1, j_type.toUpperCase());
+				Scope scope1 = new Scope(current_scope.clone());
+				SymbolRow sr1 = new SymbolRow(token1, type1, scope1, offset, true);
+				offset++;
+				sym_table.addSymbol(sr1);
+			}
+
+			JSONObject jt_parameter_list = (JSONObject) j_parameter_list.get("parameter_list");
+			if(jt_parameter_list == null) {
+				flag = false;
+			}
+
+			while(flag) {			
+				j_identifier_list = (JSONArray) jt_parameter_list.get("identifier_list");				
+				
+				j_type = jt_parameter_list.get("type").toString();
+				
+				for(Object value : j_identifier_list) {
+					Token token2 =  new Token( value.toString(), 0, 0);
+					CustomType type2 = new CustomType(tright + 1, tleft + 1, j_type.toUpperCase());
+					Scope scope2 = new Scope(current_scope.clone());
+					SymbolRow sr2 = new SymbolRow(token2, type2, scope2, offset, true);
+					offset++;
+					sym_table.addSymbol(sr2);
+				}
+	
+				jt_parameter_list = (JSONObject) jt_parameter_list.get("parameter_list");
+				if(jt_parameter_list == null) {
+					flag = false;
+				}
+			}
+
 			RESULT = myJson;
 		
               CUP$parser$result = parser.getSymbolFactory().newSymbol("subprogram_head",8, ((java_cup.runtime.Symbol)CUP$parser$stack.elementAt(CUP$parser$top-5)), ((java_cup.runtime.Symbol)CUP$parser$stack.peek()), RESULT);
@@ -1165,6 +1209,50 @@ class CUP$parser$actions {
 
 			current_scope.add(v);
 
+			// ASSING PARAMS
+
+			boolean flag = true;
+			JSONObject j_arguments = (JSONObject) a;
+			JSONObject j_parameter_list = (JSONObject) j_arguments.get("parameter_list");			
+			
+			JSONArray j_identifier_list = (JSONArray) j_parameter_list.get("identifier_list");			
+			
+			String j_type = j_parameter_list.get("type").toString();			
+
+			for(Object value : j_identifier_list) {
+				Token token1 = new Token( value.toString(), 0, 0);
+				CustomType type1 = new CustomType(0,0, j_type.toUpperCase());
+				Scope scope1 = new Scope(current_scope.clone());
+				SymbolRow sr1 = new SymbolRow(token1, type1, scope1, offset, true);
+				offset++;
+				sym_table.addSymbol(sr1);
+			}
+
+			JSONObject jt_parameter_list = (JSONObject) j_parameter_list.get("parameter_list");
+			if(jt_parameter_list == null) {
+				flag = false;
+			}
+
+			while(flag) {			
+				j_identifier_list = (JSONArray) jt_parameter_list.get("identifier_list");				
+				
+				j_type = jt_parameter_list.get("type").toString();
+				
+				for(Object value : j_identifier_list) {
+					Token token2 =  new Token( value.toString(), 0, 0);
+					CustomType type2 = new CustomType(0,0, j_type.toUpperCase());
+					Scope scope2 = new Scope(current_scope.clone());
+					SymbolRow sr2 = new SymbolRow(token2, type2, scope2, offset, true);
+					offset++;
+					sym_table.addSymbol(sr2);
+				}
+	
+				jt_parameter_list = (JSONObject) jt_parameter_list.get("parameter_list");
+				if(jt_parameter_list == null) {
+					flag = false;
+				}
+			}
+
 			RESULT = myJson;
 		
               CUP$parser$result = parser.getSymbolFactory().newSymbol("subprogram_head",8, ((java_cup.runtime.Symbol)CUP$parser$stack.elementAt(CUP$parser$top-4)), ((java_cup.runtime.Symbol)CUP$parser$stack.peek()), RESULT);
@@ -1205,6 +1293,51 @@ class CUP$parser$actions {
 			sym_table.addSymbol(sr);
 
 			current_scope.add(v);
+
+			// ASSING PARAMS
+
+			boolean flag = true;
+			JSONObject j_arguments = (JSONObject) a;
+			JSONObject j_parameter_list = (JSONObject) j_arguments.get("parameter_list");			
+			
+			JSONArray j_identifier_list = (JSONArray) j_parameter_list.get("identifier_list");			
+			
+			String j_type = j_parameter_list.get("type").toString();			
+
+			for(Object value : j_identifier_list) {
+				Token token1 = new Token( value.toString(), 0, 0);
+				CustomType type1 = new CustomType(0,0, j_type.toUpperCase());
+				Scope scope1 = new Scope(current_scope.clone());
+				SymbolRow sr1 = new SymbolRow(token1, type1, scope1, offset, true);
+				offset++;
+				sym_table.addSymbol(sr1);
+			}
+
+			JSONObject jt_parameter_list = (JSONObject) j_parameter_list.get("parameter_list");
+			if(jt_parameter_list == null) {
+				flag = false;
+			}
+
+			while(flag) {			
+				j_identifier_list = (JSONArray) jt_parameter_list.get("identifier_list");				
+				
+				j_type = jt_parameter_list.get("type").toString();
+				
+				for(Object value : j_identifier_list) {
+					Token token2 =  new Token( value.toString(), 0, 0);
+					CustomType type2 = new CustomType(0,0, j_type.toUpperCase());
+					Scope scope2 = new Scope(current_scope.clone());
+					SymbolRow sr2 = new SymbolRow(token2, type2, scope2, offset, true);
+					offset++;
+					sym_table.addSymbol(sr2);
+				}
+	
+				jt_parameter_list = (JSONObject) jt_parameter_list.get("parameter_list");
+				if(jt_parameter_list == null) {
+					flag = false;
+				}
+			}
+
 
 			RESULT = myJson;
 		
@@ -1247,6 +1380,13 @@ class CUP$parser$actions {
               Object RESULT =null;
 		
 			JSONObject myJson = new JSONObject();
+			JSONObject fake = new JSONObject();
+			myJson.put("ParentesisAbierto", "");
+			fake.put("type", "fake");
+			JSONArray id_list = new JSONArray();
+			fake.put("identifier_list", id_list);
+			myJson.put("parameter_list", fake);
+			myJson.put("ParentesisCerrado", "");
 			
 			myJson.put("validate_type", "VOID");
 

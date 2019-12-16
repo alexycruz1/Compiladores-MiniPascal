@@ -404,18 +404,7 @@ subprogram_declaration ::=
 
 // subprogram_head //
 subprogram_head ::=
-	Function: p Variable: v
-		{:
-			Token token = new Token(v, vright + 1, vleft + 1);
-			CustomType type = new CustomType(pright + 1, pleft + 1, type_a);
-			Scope scope = new Scope(current_scope.clone());
-			SymbolRow sr = new SymbolRow(token, type, scope, offset);
-			offset++;
-			sym_table.addSymbol(sr);
-
-			current_scope.add(v);
-		:}
-	arguments: a AsignacionTipo: at standard_type: t final_instruccion_error
+	Function: p Variable: v arguments: a AsignacionTipo: at standard_type: t final_instruccion_error
 		{:						
 			JSONObject myJson = new JSONObject();
 			myJson.put("Function", p.toString());
@@ -428,11 +417,6 @@ subprogram_head ::=
 
 			myJson.put("validate_type", type_a);
 
-			RESULT = myJson;
-		:}
-		|
-	Function: p Variable: v 
-		{:
 			Token token = new Token(v, vright + 1, vleft + 1);
 			CustomType type = new CustomType(pright + 1, pleft + 1, type_a);
 			Scope scope = new Scope(current_scope.clone());
@@ -441,8 +425,55 @@ subprogram_head ::=
 			sym_table.addSymbol(sr);
 
 			current_scope.add(v);
+
+			// ASSING PARAMS
+
+			boolean flag = true;
+			JSONObject j_arguments = (JSONObject) a;
+			JSONObject j_parameter_list = (JSONObject) j_arguments.get("parameter_list");			
+			
+			JSONArray j_identifier_list = (JSONArray) j_parameter_list.get("identifier_list");			
+			
+			String j_type = j_parameter_list.get("type").toString();			
+
+			for(Object value : j_identifier_list) {
+				Token token1 = new Token( value.toString(), 0, 0);
+				CustomType type1 = new CustomType(tright + 1, tleft + 1, j_type.toUpperCase());
+				Scope scope1 = new Scope(current_scope.clone());
+				SymbolRow sr1 = new SymbolRow(token1, type1, scope1, offset, true);
+				offset++;
+				sym_table.addSymbol(sr1);
+			}
+
+			JSONObject jt_parameter_list = (JSONObject) j_parameter_list.get("parameter_list");
+			if(jt_parameter_list == null) {
+				flag = false;
+			}
+
+			while(flag) {			
+				j_identifier_list = (JSONArray) jt_parameter_list.get("identifier_list");				
+				
+				j_type = jt_parameter_list.get("type").toString();
+				
+				for(Object value : j_identifier_list) {
+					Token token2 =  new Token( value.toString(), 0, 0);
+					CustomType type2 = new CustomType(tright + 1, tleft + 1, j_type.toUpperCase());
+					Scope scope2 = new Scope(current_scope.clone());
+					SymbolRow sr2 = new SymbolRow(token2, type2, scope2, offset, true);
+					offset++;
+					sym_table.addSymbol(sr2);
+				}
+	
+				jt_parameter_list = (JSONObject) jt_parameter_list.get("parameter_list");
+				if(jt_parameter_list == null) {
+					flag = false;
+				}
+			}
+
+			RESULT = myJson;
 		:}
-	arguments: a AsignacionTipo: at final_instruccion_error
+		|
+	Function: p Variable: v arguments: a AsignacionTipo: at final_instruccion_error
 		{:
 			JSONObject myJson = new JSONObject();
 			myJson.put("Function", p.toString());
@@ -453,12 +484,7 @@ subprogram_head ::=
 			String type_a = ((JSONObject) a).get("validate_type").toString() + " => VOID";
 
 			myJson.put("validate_type", type_a);
-		
-			RESULT = myJson;
-		:}
-		|
-	Procedure: p Variable: v 
-		{:
+			
 			Token token = new Token(v, vright + 1, vleft + 1);
 			CustomType type = new CustomType(pright + 1, pleft + 1, type_a);
 			Scope scope = new Scope(current_scope.clone());
@@ -467,8 +493,55 @@ subprogram_head ::=
 			sym_table.addSymbol(sr);
 
 			current_scope.add(v);
+
+			// ASSING PARAMS
+
+			boolean flag = true;
+			JSONObject j_arguments = (JSONObject) a;
+			JSONObject j_parameter_list = (JSONObject) j_arguments.get("parameter_list");			
+			
+			JSONArray j_identifier_list = (JSONArray) j_parameter_list.get("identifier_list");			
+			
+			String j_type = j_parameter_list.get("type").toString();			
+
+			for(Object value : j_identifier_list) {
+				Token token1 = new Token( value.toString(), 0, 0);
+				CustomType type1 = new CustomType(0,0, j_type.toUpperCase());
+				Scope scope1 = new Scope(current_scope.clone());
+				SymbolRow sr1 = new SymbolRow(token1, type1, scope1, offset, true);
+				offset++;
+				sym_table.addSymbol(sr1);
+			}
+
+			JSONObject jt_parameter_list = (JSONObject) j_parameter_list.get("parameter_list");
+			if(jt_parameter_list == null) {
+				flag = false;
+			}
+
+			while(flag) {			
+				j_identifier_list = (JSONArray) jt_parameter_list.get("identifier_list");				
+				
+				j_type = jt_parameter_list.get("type").toString();
+				
+				for(Object value : j_identifier_list) {
+					Token token2 =  new Token( value.toString(), 0, 0);
+					CustomType type2 = new CustomType(0,0, j_type.toUpperCase());
+					Scope scope2 = new Scope(current_scope.clone());
+					SymbolRow sr2 = new SymbolRow(token2, type2, scope2, offset, true);
+					offset++;
+					sym_table.addSymbol(sr2);
+				}
+	
+				jt_parameter_list = (JSONObject) jt_parameter_list.get("parameter_list");
+				if(jt_parameter_list == null) {
+					flag = false;
+				}
+			}
+
+			RESULT = myJson;
 		:}
-	arguments: a FinalInstruccion: fi
+		|
+	Procedure: p Variable: v arguments: a FinalInstruccion: fi
 		{:
 			JSONObject myJson = new JSONObject();
 			myJson.put("Procedure", p.toString());
@@ -478,7 +551,60 @@ subprogram_head ::=
 
 			String type_a = ((JSONObject) a).get("validate_type").toString() + " => VOID";
 
-			myJson.put("validate_type", type_a);		
+			myJson.put("validate_type", type_a);
+			Token token = new Token(v, vright + 1, vleft + 1);
+			CustomType type = new CustomType(pright + 1, pleft + 1, type_a);
+			Scope scope = new Scope(current_scope.clone());
+			SymbolRow sr = new SymbolRow(token, type, scope, offset);
+			offset++;
+			sym_table.addSymbol(sr);
+
+			current_scope.add(v);
+
+			// ASSING PARAMS
+
+			boolean flag = true;
+			JSONObject j_arguments = (JSONObject) a;
+			JSONObject j_parameter_list = (JSONObject) j_arguments.get("parameter_list");			
+			
+			JSONArray j_identifier_list = (JSONArray) j_parameter_list.get("identifier_list");			
+			
+			String j_type = j_parameter_list.get("type").toString();			
+
+			for(Object value : j_identifier_list) {
+				Token token1 = new Token( value.toString(), 0, 0);
+				CustomType type1 = new CustomType(0,0, j_type.toUpperCase());
+				Scope scope1 = new Scope(current_scope.clone());
+				SymbolRow sr1 = new SymbolRow(token1, type1, scope1, offset, true);
+				offset++;
+				sym_table.addSymbol(sr1);
+			}
+
+			JSONObject jt_parameter_list = (JSONObject) j_parameter_list.get("parameter_list");
+			if(jt_parameter_list == null) {
+				flag = false;
+			}
+
+			while(flag) {			
+				j_identifier_list = (JSONArray) jt_parameter_list.get("identifier_list");				
+				
+				j_type = jt_parameter_list.get("type").toString();
+				
+				for(Object value : j_identifier_list) {
+					Token token2 =  new Token( value.toString(), 0, 0);
+					CustomType type2 = new CustomType(0,0, j_type.toUpperCase());
+					Scope scope2 = new Scope(current_scope.clone());
+					SymbolRow sr2 = new SymbolRow(token2, type2, scope2, offset, true);
+					offset++;
+					sym_table.addSymbol(sr2);
+				}
+	
+				jt_parameter_list = (JSONObject) jt_parameter_list.get("parameter_list");
+				if(jt_parameter_list == null) {
+					flag = false;
+				}
+			}
+
 
 			RESULT = myJson;
 		:}
@@ -503,6 +629,13 @@ arguments ::=
 		|
 		{:
 			JSONObject myJson = new JSONObject();
+			JSONObject fake = new JSONObject();
+			myJson.put("ParentesisAbierto", "");
+			fake.put("type", "fake");
+			JSONArray id_list = new JSONArray();
+			fake.put("identifier_list", id_list);
+			myJson.put("parameter_list", fake);
+			myJson.put("ParentesisCerrado", "");
 			
 			myJson.put("validate_type", "VOID");
 
@@ -530,15 +663,6 @@ parameter_list ::=
 				real_type = t.toString() + " X " + real_type;
 			}
 
-			for(Object value : (ArrayList) il) {
-				Token token = (Token)ids.get(i);
-				CustomType type = new CustomType(tright + 1, tleft + 1, t.toString().toUpperCase());
-				Scope scope = new Scope(current_scope.clone());
-				SymbolRow sr = new SymbolRow(token, type, scope, offset);
-				//offset++;
-				sym_table.addSymbol(sr);
-			}
-
 			myJson.put("validate_type", real_type);
 
 			RESULT = myJson;
@@ -564,15 +688,6 @@ parameter_list ::=
 			}
 			String type_list = ((JSONObject) pl).get("validate_type").toString();
 			real_type = type_list + real_type;
-
-			for(Object value : (ArrayList) il) {
-				Token token = (Token)ids.get(i);
-				CustomType type = new CustomType(tright + 1, tleft + 1, t.toString().toUpperCase());
-				Scope scope = new Scope(current_scope.clone());
-				SymbolRow sr = new SymbolRow(token, type, scope, offset);
-				//offset++;
-				sym_table.addSymbol(sr);
-			}
 
 			myJson.put("validate_type", real_type);
 

@@ -31,7 +31,9 @@
           <Group type="102" alignment="1" attributes="0">
               <EmptySpace min="-2" pref="273" max="-2" attributes="0"/>
               <Component id="jButton1" pref="0" max="32767" attributes="0"/>
-              <EmptySpace min="-2" pref="258" max="-2" attributes="0"/>
+              <EmptySpace min="-2" pref="214" max="-2" attributes="0"/>
+              <Component id="status" min="-2" max="-2" attributes="0"/>
+              <EmptySpace max="-2" attributes="0"/>
           </Group>
       </Group>
     </DimensionLayout>
@@ -39,8 +41,11 @@
       <Group type="103" groupAlignment="0" attributes="0">
           <Group type="102" alignment="0" attributes="0">
               <Component id="jTabbedPane1" max="32767" attributes="0"/>
-              <EmptySpace min="-2" max="-2" attributes="0"/>
-              <Component id="jButton1" min="-2" max="-2" attributes="0"/>
+              <EmptySpace max="-2" attributes="0"/>
+              <Group type="103" groupAlignment="3" attributes="0">
+                  <Component id="jButton1" alignment="3" min="-2" max="-2" attributes="0"/>
+                  <Component id="status" alignment="3" min="-2" max="-2" attributes="0"/>
+              </Group>
               <EmptySpace min="-2" max="-2" attributes="0"/>
           </Group>
       </Group>
@@ -279,6 +284,11 @@
       <Events>
         <EventHandler event="mouseClicked" listener="java.awt.event.MouseListener" parameters="java.awt.event.MouseEvent" handler="jButton1MouseClicked"/>
       </Events>
+    </Component>
+    <Component class="javax.swing.JLabel" name="status">
+      <Properties>
+        <Property name="text" type="java.lang.String" value="Estado:"/>
+      </Properties>
     </Component>
   </SubComponents>
 </Form>

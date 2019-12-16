@@ -14,7 +14,7 @@ begin
    write('Estamos dentro del procedimiento',variable);
 end;
 {-----------------------------------------}
- FUNCTION max(num1, num2:INTEGER):INTEGER;
+ FUNCTION max(num21, num22:INTEGER):INTEGER;
   VAR result1:INTEGER;
   VAR result2:INTEGER;
   BEGIN

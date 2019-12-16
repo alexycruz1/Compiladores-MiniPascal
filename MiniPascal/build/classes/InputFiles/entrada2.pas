@@ -1,6 +1,6 @@
 PROGRAM Ordenamiento;
 var exit: boolean;
-Var x,nada:Integer;
+Var x,nada, a:Integer;
 VAR choice:char;
 begin
     choice := 'y';
@@ -29,10 +29,10 @@ begin
                                 write('value of a: ', a);
                             end;
                         {---------------------------------------------}
-                        exit := 1;
+                        x := 1;
                     END
             else
-                exit := 0;
+                x := 0;
         END;
     {-------------------------------------------}
 end.

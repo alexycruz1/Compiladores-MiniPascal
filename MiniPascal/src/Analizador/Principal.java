@@ -52,6 +52,7 @@ public class Principal extends javax.swing.JFrame {
         jScrollPane4 = new javax.swing.JScrollPane();
         err_ta = new javax.swing.JTextArea();
         jButton1 = new javax.swing.JButton();
+        status = new javax.swing.JLabel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setTitle("Mini-Pascal");
@@ -171,6 +172,8 @@ public class Principal extends javax.swing.JFrame {
             }
         });
 
+        status.setText("Estado:");
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
@@ -178,15 +181,19 @@ public class Principal extends javax.swing.JFrame {
             .addComponent(jTabbedPane1)
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
                 .addGap(273, 273, 273)
-                .addComponent(jButton1, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE)
-                .addGap(258, 258, 258))
+                .addComponent(jButton1, javax.swing.GroupLayout.PREFERRED_SIZE, 1, Short.MAX_VALUE)
+                .addGap(214, 214, 214)
+                .addComponent(status)
+                .addContainerGap())
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
                 .addComponent(jTabbedPane1)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jButton1)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jButton1)
+                    .addComponent(status))
                 .addContainerGap())
         );
 
@@ -199,25 +206,34 @@ public class Principal extends javax.swing.JFrame {
         String fileName = JOptionPane.showInputDialog(this, "Escribe el nombre del archivo sin extension", "Mini Pascal", JOptionPane.INFORMATION_MESSAGE);
 
         try {
-            DefaultTableModel model = (DefaultTableModel) symb_table.getModel();
-            for (int i = 0; i < model.getRowCount(); i++) {
-                model.removeRow(i);
-            }
+            status.setText("Estado: ...");
+                status.setForeground(new java.awt.Color(0, 0, 0));
+            DefaultTableModel model = new DefaultTableModel(new Object[][]{}, new String[]{"Id", "Tipo", "Ámbito", "Offset", "Param"});
+
+            AnalizadorLexico scanner = new AnalizadorLexico(new FileReader(new File("src/InputFiles/" + fileName + ".pas")));
             ats_ta.setText("");
             err_ta.setText("");
-            AnalizadorLexico scanner = new AnalizadorLexico(new FileReader(new File("src/InputFiles/" + fileName + ".pas")));
 
             parser parser = new parser(scanner);
             parser.parse();
 
-            parser.sym_table.fill_table(model);
+            if(parser.errors.isEmpty()) {
+                status.setText("Estado: Compilación exitosa");
+                status.setForeground(new java.awt.Color(0, 204, 0));
+            } else {
+                status.setForeground(new java.awt.Color(255, 0, 0));
+                status.setText("Estado: Compilación fallida");               
+            }
             
+            parser.sym_table.fill_table(model);
+
             ats_ta.setText(parser.printTree(parser.program_json));
             String errors = "";
             for (String error : parser.errors) {
                 errors += error + "\n";
             }
             err_ta.setText(errors);
+            symb_table.setModel(model);
 
         } catch (Exception e) {
             e.printStackTrace();
@@ -275,6 +291,7 @@ public class Principal extends javax.swing.JFrame {
     private javax.swing.JScrollPane jScrollPane2;
     private javax.swing.JScrollPane jScrollPane4;
     private javax.swing.JTabbedPane jTabbedPane1;
+    private javax.swing.JLabel status;
     private javax.swing.JTable symb_table;
     // End of variables declaration//GEN-END:variables
 }
