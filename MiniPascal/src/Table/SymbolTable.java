@@ -44,7 +44,7 @@ public class SymbolTable {
 
     public void fill_table(DefaultTableModel model) {
         for (SymbolRow row : table) {
-            model.addRow(new Object[]{row.id, row.type, row.scope.toString().replaceAll("\\[|]", ""), row.offset});
+            model.addRow(new Object[]{row.id, row.type, row.scope.toString().replaceAll("\\[|]", ""), row.offset, (row.param ? "✓" : "")});
         }
     }
 

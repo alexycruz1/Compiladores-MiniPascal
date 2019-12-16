@@ -64,11 +64,11 @@ public class Principal extends javax.swing.JFrame {
 
             },
             new String [] {
-                "Id", "Tipo", "Ámbito", "Offset"
+                "Id", "Tipo", "Ámbito", "Offset", "Param"
             }
         ) {
             boolean[] canEdit = new boolean [] {
-                false, false, false, false
+                false, false, false, false, false
             };
 
             public boolean isCellEditable(int rowIndex, int columnIndex) {
@@ -76,10 +76,6 @@ public class Principal extends javax.swing.JFrame {
             }
         });
         jScrollPane1.setViewportView(symb_table);
-        if (symb_table.getColumnModel().getColumnCount() > 0) {
-            symb_table.getColumnModel().getColumn(2).setResizable(false);
-            symb_table.getColumnModel().getColumn(3).setResizable(false);
-        }
 
         javax.swing.GroupLayout jPanel4Layout = new javax.swing.GroupLayout(jPanel4);
         jPanel4.setLayout(jPanel4Layout);
