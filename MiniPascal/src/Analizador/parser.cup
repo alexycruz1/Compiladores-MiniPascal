@@ -805,6 +805,7 @@ procedure_statement ::=
 			}
 			JSONObject myJson = new JSONObject();
 			myJson.put("Variable", v.toString());
+			myJson.put("validate_type", v.toString());
 			RESULT = myJson;
 		:}
 		|
@@ -833,9 +834,8 @@ procedure_statement ::=
 				String type2 = ((JSONObject) el).get("validate_type").toString().replaceAll("ERROR", "VOID");
 				type2 = "(" + type2 + ")";
 
-				if(type1.equals(type2)) {
-					type1 = current_var.type.type;
-				} else {
+				type1 = current_var.type.type;
+				if(!type1.equals(type2)) {
 					errors.add("Error: No se encuentra subprograma " + v.toString() + " con parámetros " + type2 + " (" + (vleft + 1) + ", " + (vright +1) +")." );
 				}				
 				myJson.put("validate_type", type1.substring(type1.lastIndexOf(" =>") + 4, type1.length()) );
