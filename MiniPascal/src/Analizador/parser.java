@@ -1475,8 +1475,15 @@ class CUP$parser$actions {
 			SymbolRow current_var = sym_table.find(v.toString(), current_scope);
 			if(current_var == null) {
 				errors.add("Error: No existe la variable " + v.toString() + " (" + (vleft + 1) + ", " + (vright +1) +")." );
-			} else if(current_var.type.type.equals("PROCEDURE") || current_var.type.type.equals("PROCEDURE")) {
-				errors.add("Error: El identificador " + v.toString() + " es un subprograma, no es posible asignar un valor (" + (vleft + 1) + ", " + (vright +1) +")." );				
+			} else if(current_var.type.type.contains(" => ") ) {
+				
+			} else if(current_var != null) {
+				String type1 = current_var.type.type;
+				String type2 = ((JSONObject) exp).get("validate_type").toString();
+				
+				if(!type1.equals(type2)) {
+					errors.add("Error: No es posible asignar un " + type2 + " a una variable " + type1 + " (" + (vleft + 1) + ", " + (vright +1) +")." );
+				}
 			}
 
 			myJson.put("Variable", v.toString());
@@ -1582,6 +1589,13 @@ class CUP$parser$actions {
 			myJson.put("statement", (JSONObject) if_state);
 			myJson.put("Else", els.toString());
 			myJson.put("statement", (JSONObject) if_else_state);
+
+			String type1 = ((JSONObject) exp).get("validate_type").toString();
+			
+			if(!type1.equals("BOOLEAN")) {
+				errors.add("Error: Se requiere un BOOLEAN (" + (expleft + 1) + ", " + (expright +1) +")." );
+			}
+
 			RESULT = myJson;
 		
               CUP$parser$result = parser.getSymbolFactory().newSymbol("statement",13, ((java_cup.runtime.Symbol)CUP$parser$stack.elementAt(CUP$parser$top-5)), ((java_cup.runtime.Symbol)CUP$parser$stack.peek()), RESULT);
@@ -1621,6 +1635,13 @@ class CUP$parser$actions {
 			myJson.put("expression", (JSONObject) exp);
 			myJson.put("Do", d.toString());
 			myJson.put("statement", (JSONObject) state);
+
+			String type1 = ((JSONObject) exp).get("validate_type").toString();
+			
+			if(!type1.equals("BOOLEAN")) {
+				errors.add("Error: Se requiere un BOOLEAN (" + (wleft + 1) + ", " + (wright +1) +")." );
+			}
+
 			RESULT = myJson;			
 		
               CUP$parser$result = parser.getSymbolFactory().newSymbol("statement",13, ((java_cup.runtime.Symbol)CUP$parser$stack.elementAt(CUP$parser$top-3)), ((java_cup.runtime.Symbol)CUP$parser$stack.peek()), RESULT);
@@ -1667,12 +1688,6 @@ class CUP$parser$actions {
 		int stateright = ((java_cup.runtime.Symbol)CUP$parser$stack.peek()).right;
 		Object state = (Object)((java_cup.runtime.Symbol) CUP$parser$stack.peek()).value;
 		
-			SymbolRow current_var = sym_table.find(v.toString(), current_scope);
-			if(current_var == null) {
-				errors.add("Error: No existe la variable " + v.toString() + " (" + (vleft + 1) + ", " + (vright +1) +")." );
-			} else if(current_var.type.type.equals("PROCEDURE") || current_var.type.type.equals("PROCEDURE")) {
-				errors.add("Error: El identificador " + v.toString() + " es un subprograma, no es posible asignar un valor (" + (vleft + 1) + ", " + (vright +1) +")." );				
-			}
 			JSONObject myJson = new JSONObject();
 			myJson.put("For", f.toString());
 			myJson.put("Variable", v.toString());
@@ -1682,6 +1697,28 @@ class CUP$parser$actions {
 			myJson.put("expression", (JSONObject) exp);
 			myJson.put("Do", d.toString());
 			myJson.put("statement", (JSONObject) state);
+			
+			SymbolRow current_var = sym_table.find(v.toString(), current_scope);
+			if(current_var == null) {
+				errors.add("Error: No existe la variable " + v.toString() + " (" + (vleft + 1) + ", " + (vright +1) +")." );
+			} else if(current_var.type.type.contains(" => ")) {
+				errors.add("Error: El identificador " + v.toString() + " es un subprograma, no es posible asignar un valor (" + (vleft + 1) + ", " + (vright +1) +")." );				
+			}
+
+			if(current_var != null) {
+				String type1 = current_var.type.type;
+				String type2 = ((JSONObject) fac).get("validate_type").toString();
+				String type3 = ((JSONObject) exp).get("validate_type").toString();
+				
+				if(!type1.equals(type2)) {
+					errors.add("Error: No es posible asignar un " + type2 + " a una variable " + type1 + " (" + (vleft + 1) + ", " + (vright +1) +")." );
+				}
+
+				if(!type1.equals(type3)) {
+					errors.add("Error: No es posible asignar un " + type3 + " a una variable " + type1 + " (" + (vleft + 1) + ", " + (vright +1) +")." );
+				}
+			}
+
 			RESULT = myJson;
 		
               CUP$parser$result = parser.getSymbolFactory().newSymbol("statement",13, ((java_cup.runtime.Symbol)CUP$parser$stack.elementAt(CUP$parser$top-7)), ((java_cup.runtime.Symbol)CUP$parser$stack.peek()), RESULT);
@@ -1722,12 +1759,6 @@ class CUP$parser$actions {
 		int expright = ((java_cup.runtime.Symbol)CUP$parser$stack.peek()).right;
 		Object exp = (Object)((java_cup.runtime.Symbol) CUP$parser$stack.peek()).value;
 		
-			SymbolRow current_var = sym_table.find(v.toString(), current_scope);
-			if(current_var == null) {
-				errors.add("Error: No existe la variable " + v.toString() + " (" + (vleft + 1) + ", " + (vright +1) +")." );
-			} else if(current_var.type.type.equals("PROCEDURE") || current_var.type.type.equals("PROCEDURE")) {
-				errors.add("Error: El identificador " + v.toString() + " es un subprograma, no es posible asignar un valor (" + (vleft + 1) + ", " + (vright +1) +")." );				
-			}
 			JSONObject myJson = new JSONObject();
 			myJson.put("Repeat", r.toString());
 			myJson.put("statement", (JSONObject) state);
@@ -1735,6 +1766,23 @@ class CUP$parser$actions {
 			myJson.put("Variable", v.toString());
 			myJson.put("AsignacionIgual", ai.toString());
 			myJson.put("expression", (JSONObject) exp);
+
+			SymbolRow current_var = sym_table.find(v.toString(), current_scope);
+			if(current_var == null) {
+				errors.add("Error: No existe la variable " + v.toString() + " (" + (vleft + 1) + ", " + (vright +1) +")." );
+			} else if(current_var.type.type.contains(" => ")) {
+				errors.add("Error: El identificador " + v.toString() + " es un subprograma, no es posible asignar un valor (" + (vleft + 1) + ", " + (vright +1) +")." );				
+			}
+
+			if(current_var != null) {
+				String type1 = current_var.type.type;
+				String type2 = ((JSONObject) exp).get("validate_type").toString();
+				
+				if(!type1.equals(type2)) {
+					errors.add("Error: No es posible asignar un " + type2 + " a una variable " + type1 + " (" + (vleft + 1) + ", " + (vright +1) +")." );
+				}
+			}
+				
 			RESULT = myJson;
 		
               CUP$parser$result = parser.getSymbolFactory().newSymbol("statement",13, ((java_cup.runtime.Symbol)CUP$parser$stack.elementAt(CUP$parser$top-5)), ((java_cup.runtime.Symbol)CUP$parser$stack.peek()), RESULT);
@@ -1840,8 +1888,6 @@ class CUP$parser$actions {
 			SymbolRow current_var = sym_table.find(v.toString(), current_scope);
 			if(current_var == null) {
 				errors.add("Error: No existe la variable " + v.toString() + " (" + (vleft + 1) + ", " + (vright +1) +")." );
-			} else if(current_var.type.type.equals("PROCEDURE") || current_var.type.type.equals("PROCEDURE")) {
-				errors.add("Error: El identificador " + v.toString() + " es un subprograma, no es posible asignar un valor (" + (vleft + 1) + ", " + (vright +1) +")." );				
 			}
 			JSONObject myJson = new JSONObject();
 			myJson.put("Read", r.toString());
@@ -1862,13 +1908,17 @@ class CUP$parser$actions {
 		int vright = ((java_cup.runtime.Symbol)CUP$parser$stack.peek()).right;
 		Object v = (Object)((java_cup.runtime.Symbol) CUP$parser$stack.peek()).value;
 		
+			JSONObject myJson = new JSONObject();
 			SymbolRow current_var = sym_table.find(v.toString(), current_scope);
 			if(current_var == null) {
 				errors.add("Error: No existe la variable " + v.toString() + " (" + (vleft + 1) + ", " + (vright +1) +")." );
+				myJson.put("validate_type", "ERROR");
 			} else if(!current_var.type.type.contains(" => ")) {
 				errors.add("Error: El identificador " + v.toString() + " no es un subprograma (" + (vleft + 1) + ", " + (vright +1) +")." );				
+				myJson.put("validate_type", current_var.type.type);
+			} else {
+				myJson.put("validate_type", current_var.type.type);
 			}
-			JSONObject myJson = new JSONObject();
 			myJson.put("Variable", v.toString());
 			RESULT = myJson;
 		
@@ -1916,11 +1966,11 @@ class CUP$parser$actions {
 				String type2 = ((JSONObject) el).get("validate_type").toString().replaceAll("ERROR", "VOID");
 				type2 = "(" + type2 + ")";
 
-				if(type1.equals(type2)) {
+				if(!type1.equals(type2)) {
 					type1 = current_var.type.type;
-				} else {
 					errors.add("Error: No se encuentra subprograma " + v.toString() + " con parámetros " + type2 + " (" + (vleft + 1) + ", " + (vright +1) +")." );
 				}				
+				type1 = current_var.type.type;
 				myJson.put("validate_type", type1.substring(type1.lastIndexOf(" =>") + 4, type1.length()) );
 			}
 			

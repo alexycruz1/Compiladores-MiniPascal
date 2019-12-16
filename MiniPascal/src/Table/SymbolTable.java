@@ -3,6 +3,7 @@ package Table;
 import Types.FunctionType;
 import java.util.ArrayList;
 import java.util.Arrays;
+import javax.swing.table.DefaultTableModel;
 
 /**
  *
@@ -34,11 +35,17 @@ public class SymbolTable {
         for (SymbolRow row : table) {
             if (row.id.valex.equals(id)
                     && (row.scope.path.toString().replaceAll("\\[|]", "").contains(scope.toString().replaceAll("\\[|]", ""))
-                    || (row.scope.path.toString().replaceAll("\\[|]", "")+ ", "+ id).contains(scope.toString().replaceAll("\\[|]", "")))) {
+                    || (row.scope.path.toString().replaceAll("\\[|]", "") + ", " + id).contains(scope.toString().replaceAll("\\[|]", "")))) {
                 return row;
             }
         }
         return null;
+    }
+
+    public void fill_table(DefaultTableModel model) {
+        for (SymbolRow row : table) {
+            model.addRow(new Object[]{row.id, row.type, row.scope.toString().replaceAll("\\[|]", ""), row.offset});
+        }
     }
 
     @Override
