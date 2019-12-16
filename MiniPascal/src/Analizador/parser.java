@@ -2663,8 +2663,9 @@ class CUP$parser$actions {
 			ArrayList<Record_Attribute> attributes;
 			if(lrv instanceof ArrayList) {
 				attributes = (ArrayList<Record_Attribute> ) lrv;
+			} else {
+				attributes = new ArrayList<Record_Attribute>();
 			}
-			attributes = new ArrayList();
 			Token token = new Token(v, vright + 1, vleft + 1);
 			CustomType  type = new CustomType(vright + 1, vleft + 1, t.toString().toUpperCase());
 			Record_Attribute attribute = new Record_Attribute(token, type);

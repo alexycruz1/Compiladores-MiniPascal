@@ -21,7 +21,7 @@ public class RecordType extends CustomType {
 
     @Override
     public String toString() {
-        return "RECORD(" + attributes.toString().replaceAll(",", "X").replaceAll("\\[|]", "") + ')';
+        return "RECORD(" + attributes.toString().replaceAll(",", " X").replaceAll("\\[|]", "") + ')';
     }
 
 }
